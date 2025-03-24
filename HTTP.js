@@ -72,7 +72,8 @@ const fetch_ = ({
     const options = getOptions_({ accessToken, method, payload });
     let response = UrlFetchApp.fetch(instanceUrl + endpoint, options);
     console.log(`HTTP.gs > 74`);
-    console.log(response);
+    console.log(instanceUrl + endpoint);
+    console.log(options);
     let json;
 
     if (method === METHODS.GET) {
@@ -106,8 +107,9 @@ const fetch_ = ({
         const hasErrorCode = hasEntries ? !!json[0].errorCode : false;
 
         if (json.hasErrors || hasErrorCode) {
-          console.log("--- error1 --- HTTP.gs > 110");
+          console.log("--- error1 --- HTTP.gs > 109");
           console.log(JSON.stringify(json));
+          logErrorFunctions('fetch_', '', '', JSON.stringify(json));
         } else console.log(json);
 
         return json;
@@ -116,7 +118,7 @@ const fetch_ = ({
       }
     }
   } catch (error) {
-    console.log("--- error2 --- HTTP.gs > 131");
+    console.log("--- error2 --- HTTP.gs > 120");
     console.log(error);
     logErrorFunctions('fetch_', '', '', error);
   }
