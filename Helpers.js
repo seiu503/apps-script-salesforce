@@ -72,9 +72,6 @@ Object.defineProperty(this, 'ifFalsy', {value: ifFalsy, enumerable : true});
  * @return {string} the JWT
  */
 const createJwt = ({ privateKey, expiresInMinutes, data = {} }) => {
-  console.log('Helpers.gs > 75 createJwt');
-  console.log('data:');
-  console.log(data);
   // Sign token using HMAC with SHA-256 algorithm
   const header = {
     alg: 'RS256'
@@ -91,36 +88,18 @@ const createJwt = ({ privateKey, expiresInMinutes, data = {} }) => {
     ...data
   };
 
-  console.log('Helpers.gs > 94');
-  console.log(payload);
-
-  // add user payload
-  // Object.keys(data).forEach(function (key) {
-  //   payload[key] = data[key];
-  // });
-
   const base64Encode = (text, json = true) => {
     const data = json ? JSON.stringify(text) : text;
     return Utilities.base64EncodeWebSafe(data).replace(/=+$/, '');
   };
-
   
   const toSign = `${base64Encode(header)}.${base64Encode(payload)}`;
-  console.log('Helpers.gs > 111');
-  console.log(toSign);
-  // const privateKey = DriveApp.getFileById(PRIVATE_KEY_FILE_ID)
-  //   .getBlob()
-  //   .getDataAsString();
   const signatureBytes = Utilities.computeRsaSha256Signature(
     toSign,
     privateKey
   );
 
-  console.log('Helpers.gs > 117');
-  // console.log(signatureBytes);
   const signature = base64Encode(signatureBytes, false);
-  console.log(`Helpers.gs > 120`);
-  console.log(`${toSign}.${signature}`);
   return `${toSign}.${signature}`;
 };
 Object.defineProperty(this, 'createJwt', {value: createJwt, enumerable : true});

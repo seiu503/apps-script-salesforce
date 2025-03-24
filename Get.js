@@ -6,7 +6,9 @@
  * @return {obj} the queried data from Salesforce
  */
 const get = (queryParameters, apiVersion) => {
-  return fetch_({ method: METHODS.GET, queryParameters: queryParameters, apiVersion: apiVersion });
+  console.log('Get.gs > 9');
+  console.log(queryParameters);
+  return fetch_({ method: METHODS.GET, queryParameters, apiVersion });
 }
 Object.defineProperty(this, 'get', {value: get, enumerable : true});
 // ['SELECT', 'FROM', 'WHERE', 'GROUP BY', 'ORDER BY', 'LIMIT', 'OFFSET', 'HAVING']
@@ -14,8 +16,8 @@ Object.defineProperty(this, 'get', {value: get, enumerable : true});
 class QueryParameters {
 
   constructor() {
-    this.select = 'Id, Name';
-    this.from = 'Opportunity';
+    this.select = 'Id, FirstName';
+    this.from = 'Contact';
   }
 
   setSelect(select) {

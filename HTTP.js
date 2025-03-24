@@ -48,14 +48,6 @@ class FetchOptions {
   }
 }
 
-// const test = () => {
-//   const t = new FetchOptions();
-
-//   // t.setMethod(METHODS.GET);
-
-//   console.log(t);
-// }
-
 const fetch_ = ({
   batch = false,
   method = METHODS.GET,
@@ -65,10 +57,7 @@ const fetch_ = ({
   sObjectId = "",
   apiVersion = 50,
 }) => {
-  // const fetch_ = (config) => {
   try {
-    console.log('HTTP.gs > 70 try block');
-    // const endpoint = createEndpoint_({ method: config.method, sObject: config.sObject, sObjectId: config.sObjectId, apiVersion: config.apiVersion, queryParameters: config.queryParameters });
     const endpoint = createEndpoint_({
       batch,
       method,
@@ -77,29 +66,23 @@ const fetch_ = ({
       apiVersion,
       queryParameters,
     });
-    console.log('HTTP.gs > 80');
-    console.log(endpoint);
     const accessTokenResponse = requestAccessToken_();
-    console.log('HTTP.gs > 83');
-    console.log(accessTokenResponse);
     const accessToken = accessTokenResponse.access_token;
     const instanceUrl = accessTokenResponse.instance_url;
     const options = getOptions_({ accessToken, method, payload });
-    console.log('HTTP.gs > 88');
-    console.log(options);
-    console.log(instanceUrl + endpoint);
     let response = UrlFetchApp.fetch(instanceUrl + endpoint, options);
+    console.log(`HTTP.gs > 74`);
+    console.log(response);
     let json;
 
     if (method === METHODS.GET) {
-      console.log('HTTP.gs > 88');
       json = JSON.parse(response.toString());
+      console.log(`HTTP.gs > 80`);
+      console.log(json);
       let records = json["records"];
       let nextUrl = json["nextRecordsUrl"];
-      console.log('HTTP.gs > 91');
+      console.log('HTTP.gs > 84');
       console.log(records);
-      console.log(nextUrl);
-
       while (!!nextUrl) {
         fetchUrl = instanceUrl + nextUrl;
         response = UrlFetchApp.fetch(fetchUrl, options);
@@ -107,12 +90,10 @@ const fetch_ = ({
         nextUrl = json["nextRecordsUrl"];
 
         records = records.concat(json["records"]);
-
-        console.log('HTTP.gs > 103');
+        console.log('HTTP.gs > 93');
         console.log(records);
-        console.log(nextUrl);
       }
-      console.log('HTTP.gs > 107');
+      console.log('HTTP.gs > 101');
       console.log(records);
 
       return records;
