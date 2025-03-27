@@ -79,11 +79,11 @@ const fetch_ = ({
     if (method === METHODS.GET) {
       json = JSON.parse(response.toString());
       console.log(`HTTP.gs > 80`);
-      console.log(json);
+      // console.log(json);
       let records = json["records"];
       let nextUrl = json["nextRecordsUrl"];
       console.log('HTTP.gs > 84');
-      console.log(records);
+      // console.log(records);
       while (!!nextUrl) {
         fetchUrl = instanceUrl + nextUrl;
         response = UrlFetchApp.fetch(fetchUrl, options);
@@ -92,10 +92,10 @@ const fetch_ = ({
 
         records = records.concat(json["records"]);
         console.log('HTTP.gs > 93');
-        console.log(records);
+        // console.log(records);
       }
-      console.log('HTTP.gs > 101');
-      console.log(records);
+      // console.log('HTTP.gs > 101');
+      // console.log(records);
 
       return records;
     } else {
