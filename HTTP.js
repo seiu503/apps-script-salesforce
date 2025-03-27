@@ -71,18 +71,18 @@ const fetch_ = ({
     const instanceUrl = accessTokenResponse.instance_url;
     const options = getOptions_({ accessToken, method, payload });
     let response = UrlFetchApp.fetch(instanceUrl + endpoint, options);
-    console.log(`HTTP.gs > 74`);
-    console.log(instanceUrl + endpoint);
-    console.log(options);
+    // console.log(`HTTP.gs > 74`);
+    // console.log(instanceUrl + endpoint);
+    // console.log(options);
     let json;
 
     if (method === METHODS.GET) {
       json = JSON.parse(response.toString());
-      console.log(`HTTP.gs > 80`);
+      // console.log(`HTTP.gs > 80`);
       // console.log(json);
       let records = json["records"];
       let nextUrl = json["nextRecordsUrl"];
-      console.log('HTTP.gs > 84');
+      // console.log('HTTP.gs > 84');
       // console.log(records);
       while (!!nextUrl) {
         fetchUrl = instanceUrl + nextUrl;

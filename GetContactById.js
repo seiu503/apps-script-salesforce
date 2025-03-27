@@ -1,5 +1,5 @@
 function getContactById(id) {
-  console.log(`test.gs > 6, id: ${id}`);
+  console.log(`getContactById.gs > 2, id: ${id}`);
   if (id) {
     const qp = new QueryParameters();
     qp.setSelect("Full_Name__c, Employer_Name_Text__c");
@@ -14,7 +14,7 @@ function getContactById(id) {
     const records = get(qp);
     console.log(records);
   } else {
-    console.log(`test.gs > 21: no Id provided`);
+    console.log(`getContactById.gs > 17: no Id provided`);
   }
   
 }
