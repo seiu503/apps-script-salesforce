@@ -47,7 +47,7 @@ async function appendNewRow(obj, sheet) { // expects a single object
       sheet.appendRow(row)
     } catch (err) {
       console.log(err);
-      logErrorFunctions('appendNewRows', [obj, sheet], '', err);
+      logErrorFunctions('appendNewRow', [obj, sheet], '', err);
     }
 }
 

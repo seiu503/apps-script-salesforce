@@ -35,21 +35,6 @@ async function loadUserTurf(employer = 'OHA - Salem | OHA | Oregon State Hospita
 
 const confirmUniqueContactId = (id) => !contactIds.includes(id);
 
-// function appendNewRows(data, sheet) { // data = array of objects
-//   console.log('appendNewRows > 30');
-//     try {
-//       data.forEach(obj => {
-//         if (confirmUniqueContactId(obj.Id)) {
-//           // flatten object to array
-//           const row = Object.values(obj).slice(1);
-//           sheet.appendRow(row);
-//         }        
-//       })
-//     } catch (err) {
-//       logErrorFunctions('appendNewRows', [data, sheet], '', err);
-//     }
-// }
-
 function appendNewRows(data, sheet) {
   console.log('appendNewRows');
   try {
@@ -65,38 +50,6 @@ function appendNewRows(data, sheet) {
     logErrorFunctions('appendNewRows', [data, sheet], '', err);
   }
 }
-
-// function setUserTurf(employerName, payload) {
-//   // Check for matching rows -- has this turf been pulled before?
-//   const allData = workers.getDataRange().getValues();
-//   const turfIndices = allData.map((row, index) => {
-//     if (row[3] === employerName) {
-//       return index + 1;
-//     }
-//   }).filter(n => n); // remove null values
-//   console.log(`setUserTurf > 66`);
-  
-//   // If no rows found, create a new row for every row in the payload from the API call in step 1
-//   if (!turfIndices.length) {
-//     // append new rows with data from paylod from loadTurf function
-//     try {
-//       appendNewRows(payload, workers);    
-//     } catch (err) {
-//       console.log(err);
-//       logErrorFunctions('setUserTurf', turfIndices, '', err);
-//     }
-//   } else {
-//     // otherwise, delete all existing rows in that turf and replace them with fresh data from Salesforce
-//     // because checking for differences at the individual cell level seems even more inefficient?
-//     try {
-//       turfIndices.forEach(index => workers.deleteRow(index));
-//       // append new rows with data from paylod from loadTurf function
-//       appendNewRows(payload, workers); 
-//     } catch (err) {
-//       logErrorFunctions('setUserTurf', turfIndices, '', err);
-//     }
-//   }
-// }
 
 function setUserTurf(employerName, payload) {
   console.log('setUserTurf');

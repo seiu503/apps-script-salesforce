@@ -1,6 +1,5 @@
-function createNewVisit(CVRSOS__Contact__c,Visit_Date__c,Visited_By__c,CVRSOS__Result__c,App_Source__c,Preferred_Language__c,Notes_Long__c) {
-  console.log(`test.gs > 25, createNewVisit`);
-  // console.log(body);
+async function createNewVisit(CVRSOS__Contact__c,Visit_Date__c,Visited_By__c,CVRSOS__Result__c,App_Source__c,Preferred_Language__c,Notes_Long__c,Signed_Card__c) {
+  console.log(`createNewVisit.gs > 2, createNewVisit`);
 
   let today = formatSFDate(new Date());
 
@@ -10,27 +9,38 @@ function createNewVisit(CVRSOS__Contact__c,Visit_Date__c,Visited_By__c,CVRSOS__R
     CVRSOS__Result__c, // 'CONTACTED - SIGNED Membership &/or CAPE',
     App_Source__c, // "Worksite",
     Preferred_Language__c, // "English",
-    Notes_Long__c // "Notes go here"
+    Notes_Long__c, // "Notes go here"
+    Signed_Card__c
   };
 
   body.Visit_Date__c = today;
 
-  console.log(`test.gs > 43}`);
+  console.log(`createNewVisit.gs > 18}`);
   console.log(body);
 
   if (body) {
     try {
-      insert({ 
+      await insert({ 
         sObject: 'CVRSOS__Visits__c', 
         payload: { ...body }
         })
+
+      // if visit is created successfully, pull in updated contact with refreshed data from SF
+      try {
+        await getContactById(CVRSOS__Contact__c);
+      } catch {
+        logErrorFunctions('createNewVisit', {body}, '', err);
+        return {
+            Success: false,
+            Error: `There was an error updating the contact, please contact the app administrator. ${err}`
+          }
+      }
       return {
         Success: true,
         Error: null
       }  
 
     } catch (err) {
-      console.log(err);
       logErrorFunctions('createNewVisit', {body}, '', err);
       return {
         Success: false,
