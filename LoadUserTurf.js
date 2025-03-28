@@ -5,10 +5,10 @@ const ss = SpreadsheetApp.openByUrl(
 const workers = ss.getSheetByName('MemberChartingApp'); 
 const contactIds = workers.getRange("A2:A").getValues().flat().filter(Boolean);
 
-// const employer = 'Employment - Salem | OED | Employment Building'; // test data
+// const employer = 'Employment - Salem | OED | Employment Building' || 'OHA - Salem | OHA | Oregon State Hospita; // test data
 // const employer = 'Beaverton | DHS | Greenbrier Parkway'; // test data
 
-async function loadUserTurf(employer = 'Beaverton | DHS | Greenbrier Parkway') {
+async function loadUserTurf(employer = 'OHA - Salem | OHA | Oregon State Hospital') {
   console.log(`loadUserTurf.gs > 6, employer: ${employer}`);
   let records;
   if (employer) {
@@ -18,14 +18,12 @@ async function loadUserTurf(employer = 'Beaverton | DHS | Greenbrier Parkway') {
       qp.setFrom("Contact");
       qp.setWhere(`Employer_Name_Text__c = \'${employer}\' AND Active_Worker__c = TRUE`);
 
-
       console.log(`loadUserTurf > 19: ${qp}`);
       records = await get(qp);
       // console.log(records);
 
-      await setUserTurf(employer, records);
+      setUserTurf(employer, records);
     } catch (err) {
-      console.log(err);
       logErrorFunctions('loadUserTurf', employer, records, err);
     }
 
@@ -35,83 +33,96 @@ async function loadUserTurf(employer = 'Beaverton | DHS | Greenbrier Parkway') {
   
 }
 
-function confirmUniqueRow(newRow) {
-  // console.log(`confirmUniqueRow > 38`);
-  // console.log(`contactId: ${newRow[0]}`);
-  const newRowId = newRow[0];
-  // console.log(`confirmUniqueRow returning ${!contactIds.includes(newRowId)} for ${newRow[1]}`);
-  return !contactIds.includes(newRowId);
+const confirmUniqueContactId = (id) => !contactIds.includes(id);
+
+// function appendNewRows(data, sheet) { // data = array of objects
+//   console.log('appendNewRows > 30');
+//     try {
+//       data.forEach(obj => {
+//         if (confirmUniqueContactId(obj.Id)) {
+//           // flatten object to array
+//           const row = Object.values(obj).slice(1);
+//           sheet.appendRow(row);
+//         }        
+//       })
+//     } catch (err) {
+//       logErrorFunctions('appendNewRows', [data, sheet], '', err);
+//     }
+// }
+
+function appendNewRows(data, sheet) {
+  console.log('appendNewRows');
+  try {
+    const values = data.reduce((ar, obj) => {
+      if (confirmUniqueContactId(obj.Id)) {
+        const row = Object.values(obj).slice(1);
+        ar.push(row);
+      }
+      return ar;
+    }, []);
+    sheet.getRange(sheet.getLastRow() + 1, 1, values.length, values[0].length).setValues(values);
+  } catch (err) {
+    logErrorFunctions('appendNewRows', [data, sheet], '', err);
+  }
 }
 
-function confirmUniqueContactId(id) {
-  // console.log(`confirmUniqueContactId > 46`);
-  // console.log(`contactId: ${id}`);
-  // console.log(`confirmUniqueContactId returning ${!contactIds.includes(id)}`);
-  return !contactIds.includes(id);
-}
-
-async function appendNewRows(data, sheet) { // expects an array of objects
-  console.log('appendNewRows > 30');
-    try {
-      await data.forEach(obj => {
-        // console.log(`appendNewRows > 56 contactId: ${obj.Id}`);
-        if (confirmUniqueContactId(obj.Id)) {
-          // flatten object to array
-          // console.log(`appendNewRows > 59 check field order here`);
-          // console.log(Object.values(obj).slice(1));
-          const row = Object.values(obj).slice(1);
-          sheet.appendRow(row);
-        } else {
-          console.log(`dup contact Id ${obj.Id}; not appending`);
-        }
-        // let row = [];
-        // fieldsArray.forEach(field => {
-        //   row.push(obj[field]);
-        // })        
-      })
-    } catch (err) {
-      console.log(err);
-      logErrorFunctions('appendNewRows', [data, sheet], '', err);
-    }
-}
-
-async function setUserTurf(employerName, payload) {
-  console.log('setUserTurf > 56');
-
-  // Check for matching rows -- has this turf been pulled before?
-  const allData = workers.getDataRange().getValues();
-  const turfIndices = [];
-  const turf = await allData.filter((row, index) => {
-    if (row[3] === employerName) {
-      turfIndices.push(index + 1);
-      return row;
-    }
-  })
-  console.log(`setUserTurf > 66`);
-  // console.log(turf); // array of arrays
-  console.log(turf.length);
-
+// function setUserTurf(employerName, payload) {
+//   // Check for matching rows -- has this turf been pulled before?
+//   const allData = workers.getDataRange().getValues();
+//   const turfIndices = allData.map((row, index) => {
+//     if (row[3] === employerName) {
+//       return index + 1;
+//     }
+//   }).filter(n => n); // remove null values
+//   console.log(`setUserTurf > 66`);
   
-  // If no rows found, create a new row for every row in the payload from the API call in step 1
-  if (!turf || !turf.length) {
-    // append new rows with data from paylod from loadTurf function
-    console.log(`setUserTurf > 57: no matching turf found, appending new data`);
+//   // If no rows found, create a new row for every row in the payload from the API call in step 1
+//   if (!turfIndices.length) {
+//     // append new rows with data from paylod from loadTurf function
+//     try {
+//       appendNewRows(payload, workers);    
+//     } catch (err) {
+//       console.log(err);
+//       logErrorFunctions('setUserTurf', turfIndices, '', err);
+//     }
+//   } else {
+//     // otherwise, delete all existing rows in that turf and replace them with fresh data from Salesforce
+//     // because checking for differences at the individual cell level seems even more inefficient?
+//     try {
+//       turfIndices.forEach(index => workers.deleteRow(index));
+//       // append new rows with data from paylod from loadTurf function
+//       appendNewRows(payload, workers); 
+//     } catch (err) {
+//       logErrorFunctions('setUserTurf', turfIndices, '', err);
+//     }
+//   }
+// }
+
+function setUserTurf(employerName, payload) {
+  console.log('setUserTurf');
+  const allData = workers.getDataRange().getValues();
+  const turfIndices = allData.map((row, index) => {
+    if (row[3] === employerName) {
+      return index + 1;
+    }
+  }).filter(n => n);
+  if (!turfIndices.length) {
+    console.log('just add new rows')
     try {
-      await appendNewRows(payload, workers);    
+      appendNewRows(payload, workers);
     } catch (err) {
-      console.log(err);
-      logErrorFunctions('setUserTurf', turf, '', err);
+      logErrorFunctions('setUserTurf', turfIndices, '', err);
     }
   } else {
-    // otherwise, delete all existing rows in that turf and replace them with fresh data from Salesforce
-    console.log(`setUserTurf > 61: found matching turf, deleting and replacing`);
+    console.log('delete, then add')
     try {
-      await turfIndices.forEach(index => workers.deleteRow(index));
-      // append new rows with data from paylod from loadTurf function
-      await appendNewRows(payload, workers); 
+      const sheetId = workers.getSheetId();
+      const requests = turfIndices.reverse().map(e => ({ deleteDimension: { range: { sheetId, startIndex: e - 1, endIndex: e, dimension: "ROWS" } } }));
+      Sheets.Spreadsheets.batchUpdate({ requests }, ss.getId());
+      SpreadsheetApp.flush();
+      appendNewRows(payload, workers);
     } catch (err) {
-      console.log(err);
-      logErrorFunctions('setUserTurf', turf, '', err);
+      logErrorFunctions('setUserTurf', turfIndices, '', err);
     }
   }
 }

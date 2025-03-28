@@ -6,8 +6,8 @@
  * @return {obj} the queried data from Salesforce
  */
 const get = (queryParameters, apiVersion) => {
-  console.log('Get.gs > 9');
-  console.log(queryParameters);
+  // console.log('Get.gs > 9');
+  // console.log(queryParameters);
   return fetch_({ method: METHODS.GET, queryParameters, apiVersion });
 }
 Object.defineProperty(this, 'get', {value: get, enumerable : true});

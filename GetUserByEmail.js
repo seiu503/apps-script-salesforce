@@ -1,19 +1,39 @@
 const users = ss.getSheetByName('Users'); 
 const userIds = users.getRange("A2:A").getValues().flat().filter(Boolean);
 
-async function getUserByEmail(email = 'fosterj@seiu503.org') {
+async function getUserByEmail(email) {
   console.log(`getUserByEmail.gs > 2, email: ${email}`);
   if (email) {
     const qp = new QueryParameters();
     qp.setSelect("Id, ContactId, Salutation_Last__c, Salutation_Name__c, Email, AppSheetTurf__c");
     qp.setFrom("User");
     qp.setWhere(`Email = \'${email}\' AND profileID__c = '00eRt0000018i89'`);
-
-    const records = get(qp);
-    console.log(records);
-    await setUser(records);
+    try {
+      const records = get(qp);
+      console.log(records);
+      await setUser(records);
+      return{
+        Turf: records[0].AppSheetTurf__c,
+        Success: true,
+        Error: null
+      }
+    } catch (err) {
+      console.log(err);
+      logErrorFunctions('getUserByEmail', email, records, err);
+      return {
+        Turf: null,
+        Success: false,
+        Error: `There was an error loading your user account, please contact the app administrator. ${err}`
+      }
+    }
+    
   } else {
     console.log(`test.gs > 21: no email provided`);
+    return {
+      Turf: null,
+      Success: false,
+      Error: "There was an error loading your user account, please contact the app administrator. No email provided to getUserByEmail function."
+    }
   }
   
 }
@@ -38,10 +58,10 @@ async function setUser(payload) {
   const allData = users.getDataRange().getValues();
   let userRowIndex;
   const user = allData.filter((row,index) => {
-    console.log('setUser > 39');
-    console.log(row[4]);
-    console.log('setUser > 41');
-    console.log(payload[0]);
+    // console.log('setUser > 39');
+    // console.log(row[4]);
+    // console.log('setUser > 41');
+    // console.log(payload[0]);
     if(row[4] === payload[0].Email) {
       userRowIndex=index+1;
       return row;

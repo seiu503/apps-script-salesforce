@@ -6,7 +6,6 @@ function createNewVisit(CVRSOS__Contact__c,Visit_Date__c,Visited_By__c,CVRSOS__R
 
   const body = {
     CVRSOS__Contact__c, // '003Rf000004I8rhIAC', // my contact
-    // Visit_Date__c, // today,
     Visited_By__c, // '00561000001dUpI', // my user
     CVRSOS__Result__c, // 'CONTACTED - SIGNED Membership &/or CAPE',
     App_Source__c, // "Worksite",
@@ -25,13 +24,26 @@ function createNewVisit(CVRSOS__Contact__c,Visit_Date__c,Visited_By__c,CVRSOS__R
         sObject: 'CVRSOS__Visits__c', 
         payload: { ...body }
         })
+      return {
+        Success: true,
+        Error: null
+      }  
 
     } catch (err) {
       console.log(err);
       logErrorFunctions('createNewVisit', {body}, '', err);
+      return {
+        Success: false,
+        Error: `There was an error saving the visit, please contact the app administrator. ${err}`
+      }
     }
 
   } else {
-    console.log(`test.gs > createNewVisit: no body`)
+    console.log(`test.gs > createNewVisit: no body`);
+    logErrorFunctions('createNewVisit', {body}, '', err);
+    return {
+        Success: false,
+        Error: `There was an error saving the visit, please contact the app administrator. No body provided to insert function.`
+      }
   }
 }
