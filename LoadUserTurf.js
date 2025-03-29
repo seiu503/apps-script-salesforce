@@ -45,7 +45,11 @@ function appendNewRows(data, sheet) {
       }
       return ar;
     }, []);
-    sheet.getRange(sheet.getLastRow() + 1, 1, values.length, values[0].length).setValues(values);
+    if (values) {
+      sheet.getRange(sheet.getLastRow() + 1, 1, values.length, values[0].length).setValues(values);
+    } else {
+      logErrorFunctions('appendNewRows', [data, sheet], '', 'No values passed to appendNewRows');
+    }
   } catch (err) {
     logErrorFunctions('appendNewRows', [data, sheet], '', err);
   }
