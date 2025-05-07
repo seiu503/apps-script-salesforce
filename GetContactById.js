@@ -1,6 +1,6 @@
 // '003Rf000004I8rhIAC'
 
-async function getContactById(id = '003Rf000004I8rhIAC') {
+async function getContactById(id) {
   // console.log(`getContactById.gs > 2, id: ${id}`);
   if (id) {
     const qp = new QueryParameters();
@@ -30,7 +30,7 @@ async function setContactById(id, payload) {
     try {
       // replace contact in matching row
       workers.deleteRow(updateIndex + 1);
-      // append new rows with data from paylod from getContactById function
+      // append new row with data from paylod from getContactById function
       appendNewRow(payload, workers); 
     } catch (err) {
       console.log(err);

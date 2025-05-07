@@ -1,7 +1,9 @@
-async function createNewVisit(CVRSOS__Contact__c,Visit_Date__c,Visited_By__c,CVRSOS__Result__c,App_Source__c,Preferred_Language__c,Notes_Long__c,Signed_Card__c) {
+async function createNewVisit(CVRSOS__Contact__c,Visit_Date__c,Visited_By__c,CVRSOS__Result__c,App_Source__c,Preferred_Language__c,Notes_Long__c) {
   console.log(`createNewVisit.gs > 2, createNewVisit`);
 
   let today = formatSFDate(new Date());
+  const Signed_Card__c = CVRSOS__Result__c.includes('SIGNED');
+  const Refused_Application__c = CVRSOS__Result__c.includes('DECLINED');
 
   const body = {
     CVRSOS__Contact__c, // '003Rf000004I8rhIAC', // my contact
@@ -10,7 +12,8 @@ async function createNewVisit(CVRSOS__Contact__c,Visit_Date__c,Visited_By__c,CVR
     App_Source__c, // "Worksite",
     Preferred_Language__c, // "English",
     Notes_Long__c, // "Notes go here"
-    Signed_Card__c
+    Signed_Card__c,
+    Refused_Application__c
   };
 
   body.Visit_Date__c = today;

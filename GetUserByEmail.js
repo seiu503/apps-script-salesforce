@@ -1,4 +1,3 @@
-const users = ss.getSheetByName('Users'); 
 const userIds = users.getRange("A2:A").getValues().flat().filter(Boolean);
 
 async function getUserByEmail(email) {
