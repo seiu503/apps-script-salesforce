@@ -5,6 +5,8 @@ const ss = SpreadsheetApp.openByUrl(
 const workers = ss.getSheetByName('MemberChartingApp'); 
 const users = ss.getSheetByName('Users');
 const contactIds = workers.getRange("A2:A").getValues().flat().filter(Boolean);
+// console.log('contactIds');
+// console.log(contactIds);
 
 // const employer = 'Employment - Salem | OED | Employment Building' || 'OHA - Salem | OHA | Oregon State Hospita; // test data
 // const employer = 'Beaverton | DHS | Greenbrier Parkway'; // test data
@@ -65,9 +67,7 @@ async function loadUserTurf(employer = 'OHA - Salem | OHA | Oregon State Hospita
   
 }
 
-const confirmUniqueContactId = (id) => !contactIds.includes(id);
-
-function appendNewRows(data, sheet, userEmail) {
+function appendNewRows(data, sheet) {
   console.log('appendNewRows');
   try {
     const values = data.reduce((ar, obj) => {
@@ -77,6 +77,11 @@ function appendNewRows(data, sheet, userEmail) {
       }
       return ar;
     }, []);
+  if (values && values.length) {
+      sheet.getRange(sheet.getLastRow() + 1, 1, values.length, values[0].length).setValues(values);
+    } else {
+      logErrorFunctions('appendNewRows', [data, sheet], '', 'No values passed to appendNewRows');
+    }
   } catch (err) {
     logErrorFunctions('appendNewRows', [data, sheet], '', err);
   }
@@ -173,19 +178,23 @@ async function setUserTurf(employerName, payload) {
       const matchingRowInPayload = intersection.find(payloadRow => payloadRow.Id === turfRow[0]);
       if (matchingRowInPayload) {
         const slicedArray = Object.values(matchingRowInPayload).slice(1);
-        if (turfRow[0] === '003Rf000000Q3ITIA0') {
+        // if (turfRow[0] === '003Rf000000Q3ITIA0') {
+        //   console.log('turfRow');
+        //   console.log(turfRow);
+        //   console.log('slicedArray');
+        //   console.log(slicedArray);
+        // }
+        if ( turfRow.every((cell, i) => looserEqual(slicedArray[i], cell))) { 
+          // console.log(`180: MATCH ${index + 1}`);
+        } else {
+          console.log(`185: NOMATCH ${index + 1}`);
           console.log('turfRow');
           console.log(turfRow);
           console.log('slicedArray');
           console.log(slicedArray);
-        }
-        if ( turfRow.every((cell) => !slicedArray.includes(cell)) ) { 
-          console.log(`180: NOMATCH ${index + 1}`);
-        // this means the row that matched on contact ID DOES NOT match entirely (eg other data is new) and needs to be updated
-        indicesOfRowsToUpdate.push(index + 1);
-        newRowsToAppend.push(Object.values(matchingRowInPayload));
-        } else {
-          // console.log(`185: match ${index + 1}`);
+          // this means the row that matched on contact ID DOES NOT match entirely (eg other data is new) and needs to be updated
+          indicesOfRowsToUpdate.push(index + 1);
+          newRowsToAppend.push(Object.values(matchingRowInPayload));
         }
       }
       

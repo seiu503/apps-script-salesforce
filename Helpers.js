@@ -164,3 +164,16 @@ formatSFDate = date => {
 
   return [year, month, day].join("-");
 };
+
+
+function isNullOrEmpty(value) {
+  return value === null || value === "";
+}
+
+function looserEqual(valA, valB) {
+  if ((valA == valB) || (isNullOrEmpty(valA) && isNullOrEmpty(valB))) {
+    return true;
+  } else {
+    return false;
+  }
+}
