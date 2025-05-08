@@ -9,7 +9,7 @@ const contactIds = workers.getRange("A2:A").getValues().flat().filter(Boolean);
 // const employer = 'Employment - Salem | OED | Employment Building' || 'OHA - Salem | OHA | Oregon State Hospita; // test data
 // const employer = 'Beaverton | DHS | Greenbrier Parkway'; // test data
 
-function updateLoadTurfTimestamp(userEmail) {
+function updateLoadTurfTimestamp(userEmail = 'schneiders@seiu503.org') {
   console.log(`updateLoadTurfTimestamp`);  
   // find user row
   const allData = users.getDataRange().getValues();
@@ -44,10 +44,11 @@ async function loadUserTurf(employer = 'OHA - Salem | OHA | Oregon State Hospita
       qp.setFrom("Contact");
       qp.setWhere(`Employer_Name_Text__c = \'${employer}\' AND Active_Worker__c = TRUE`);
 
-      console.log(`loadUserTurf > 19: ${qp}`);
       records = await get(qp);
       if (records && records.length) {
         console.log(`${records.length} records returned for ${employer}`);
+        // console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+        // console.log(records[0]);
       } else {
         console.log(`no records returned for ${employer}`);
       }
@@ -70,53 +71,146 @@ function appendNewRows(data, sheet, userEmail) {
   console.log('appendNewRows');
   try {
     const values = data.reduce((ar, obj) => {
-      if (confirmUniqueContactId(obj.Id)) {
+      if (!contactIds.includes(obj.Id)) {
         const row = Object.values(obj).slice(1);
         ar.push(row);
       }
       return ar;
     }, []);
-    if (values && values.length) {
-      sheet.getRange(sheet.getLastRow() + 1, 1, values.length, values[0].length).setValues(values);
-      try {
-        updateLoadTurfTimestamp(userEmail);
-      } catch (err) {
-        logErrorFunctions('updateLoadTurfTimestamp', [userEmail], '', err);
-      }
-      
-    } else {
-      logErrorFunctions('appendNewRows', [data, sheet], '', 'No values passed to appendNewRows');
-    }
   } catch (err) {
     logErrorFunctions('appendNewRows', [data, sheet], '', err);
   }
 }
 
-function setUserTurf(employerName, payload) {
-  console.log('setUserTurf');
+async function setUserTurf(employerName, payload) {
+  console.log(`setUserTurf: ${employerName}`);
   const allData = workers.getDataRange().getValues();
+  const payloadContactIds = payload.map(obj => obj.Id).filter(Boolean);
   const turfIndices = allData.map((row, index) => {
     if (row[3] === employerName) {
       return index + 1;
     }
   }).filter(n => n);
+  const turfRows = allData.map((row, index) => {
+    if (row[3] === employerName) {
+      return row
+    }
+  }).filter(n => n);
+  
   if (!turfIndices.length) {
     console.log('just add new rows')
     try {
       appendNewRows(payload, workers);
     } catch (err) {
-      logErrorFunctions('setUserTurf', turfIndices, '', err);
+      logErrorFunctions('setUserTurf: ALL NEW', turfIndices, '', err);
     }
   } else {
-    console.log('delete, then add')
+    console.log('diff existing turf against new data'); 
+    let rowsToDelete = [];
+    let existingTurfcontactIds = [];
     try {
+      // identify rows to DELETE
+      // values that are in existing turf but not in payloadContactIds (new data)
+      existingTurfContactIds = await allData.map((row, index) => { // 2D array containing the row index and the contact ID of rows that match on employer name
+        if (row[3] == employerName) {
+          return [index + 1, row[0]]
+        }
+      }).filter(Boolean);
+      if (existingTurfContactIds.length) {
+        // console.log('existingTurfContactIds');
+        // console.log(existingTurfContactIds);
+        rowsToDelete = existingTurfContactIds.filter(x => {
+          // console.log(`133: ${x}`);
+          if (!payloadContactIds.includes(x[1])) {
+            return x[0]
+          }
+          }).filter(Boolean); // 1D array, just the indices of the rows to delete
+        console.log('rowsToDelete:');
+        console.log(rowsToDelete);
+        if (rowsToDelete && rowsToDelete.length) {
+          const indicesOfRowsToDelete = rowsToDelete.map(row => row[0]);
+          const sheetId = workers.getSheetId();
+          const requests = indicesOfRowsToDelete.reverse().map(e => ({ deleteDimension: { range: { sheetId, startIndex: e - 1, endIndex: e, dimension: "ROWS" } } }));
+          Sheets.Spreadsheets.batchUpdate({ requests }, ss.getId());
+          SpreadsheetApp.flush();
+        } 
+      }
+            
+    } catch(err) {
+      logErrorFunctions('setUserTurf: DELETE', existingTurfContactIds, rowsToDelete, err);
+    }
+
+
+    // identify rows to ADD
+    // values that are in new data (payloadContactIds) but not in existing turf
+    const rowsToAdd = payload.filter(x => !contactIds.includes(x.Id)) // Array of objects returned from Salesforce whose contact Ids are not in Google sheet
+    console.log('rowsToAdd:');
+    console.log(rowsToAdd);
+    if (rowsToAdd && rowsToAdd.length) {
+      try {
+        appendNewRows(rowsToAdd, workers);
+      } catch (err) {
+        logErrorFunctions('setUserTurf: ADD', payloadContactIds, rowsToAdd, err);
+      }
+    }
+      
+
+    // identify rows to UPDATE
+    const intersection = payload.filter(x => contactIds.includes(x.Id)); // values in both arrays
+    console.log('intersection');
+    console.log(intersection.length);
+    // check whether any of these rows are different
+    let indicesOfRowsToUpdate = [];
+    let newRowsToAppend = [];
+    // console.log('179');
+    // console.log(`turfRows`);
+    // console.log(turfRows);
+    turfRows.forEach((turfRow, index) => {
+      // console.log(`178: ${index}`);
+      // console.log('182: turfRow');
+      // console.log(turfRow);
+      // console.log(`turfRow[0]: ${turfRow[0]}`);
+      const matchingRowInPayload = intersection.find(payloadRow => payloadRow.Id === turfRow[0]);
+      if (matchingRowInPayload) {
+        const slicedArray = Object.values(matchingRowInPayload).slice(1);
+        if (turfRow[0] === '003Rf000000Q3ITIA0') {
+          console.log('turfRow');
+          console.log(turfRow);
+          console.log('slicedArray');
+          console.log(slicedArray);
+        }
+        if ( turfRow.every((cell) => !slicedArray.includes(cell)) ) { 
+          console.log(`180: NOMATCH ${index + 1}`);
+        // this means the row that matched on contact ID DOES NOT match entirely (eg other data is new) and needs to be updated
+        indicesOfRowsToUpdate.push(index + 1);
+        newRowsToAppend.push(Object.values(matchingRowInPayload));
+        } else {
+          // console.log(`185: match ${index + 1}`);
+        }
+      }
+      
+    });
+    console.log('newRowsToAppend');
+    console.log(newRowsToAppend);
+    console.log('indicesOfRowsToUpdate');
+    console.log(indicesOfRowsToUpdate);
+    if (newRowsToAppend && newRowsToAppend.length && indicesOfRowsToUpdate && indicesOfRowsToUpdate.length) {
+      try {
       const sheetId = workers.getSheetId();
-      const requests = turfIndices.reverse().map(e => ({ deleteDimension: { range: { sheetId, startIndex: e - 1, endIndex: e, dimension: "ROWS" } } }));
+      const requests = indicesOfRowsToUpdate.reverse().map(e => ({ deleteDimension: { range: { sheetId, startIndex: e - 1, endIndex: e, dimension: "ROWS" } } }));
       Sheets.Spreadsheets.batchUpdate({ requests }, ss.getId());
       SpreadsheetApp.flush();
-      appendNewRows(payload, workers);
+      appendNewRows(newRowsToAppend, workers);
     } catch (err) {
-      logErrorFunctions('setUserTurf', turfIndices, '', err);
+      logErrorFunctions('setUserTurf: UPDATE', indicesOfRowsToUpdate, newRowsToAppend, err);
+    } 
+    }
+    
+    try {
+      updateLoadTurfTimestamp(userEmail);
+    } catch (err) {
+      logErrorFunctions('updateLoadTurfTimestamp', [userEmail], '', err);
+    }
+           
     }
   }
-}

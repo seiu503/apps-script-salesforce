@@ -144,7 +144,7 @@ Object.defineProperty(this, 'parseJwt', {value: parseJwt, enumerable : true});
 const logErrorFunctions = (functionName, input, output, error) => {
   const currentTimeStamp = new Date();
   const checkError = error ? error : 'Error contains nothing';
-  console.log(`Error on ${currentTimeStamp} at ${functionName}`);
+  console.log(`Error on ${currentTimeStamp} at ${functionName}, ${error}, ${error.stack}`);
   console.log('Input:');
   console.log(input);
   console.log('Output:');
