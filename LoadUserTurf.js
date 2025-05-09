@@ -11,31 +11,6 @@ const contactIds = workers.getRange("A2:A").getValues().flat().filter(Boolean);
 // const employer = 'Employment - Salem | OED | Employment Building' || 'OHA - Salem | OHA | Oregon State Hospita; // test data
 // const employer = 'Beaverton | DHS | Greenbrier Parkway'; // test data
 
-function updateLoadTurfTimestamp(userEmail = 'schneiders@seiu503.org') {
-  console.log(`updateLoadTurfTimestamp`);  
-  // find user row
-  const allData = users.getDataRange().getValues();
-  let userRowIndex;
-  const user = allData.filter((row,index) => {
-    // console.log('updateLoadTurfTimestamp > 49');
-    // console.log(row[4]);
-    // console.log('updateLoadTurfTimestamp > 51');
-    // console.log(userEmail);
-    if(row[4] === userEmail) {
-      userRowIndex=index+1;
-      return row;
-    }
-  })
-  console.log(`updateLoadTurfTimestamp > 58`);
-  console.log(`userRowIndex: ${userRowIndex}`);
-  // update timestamp value
-  const range = `G${userRowIndex}`; // loadTurfTimestamp cell
-  console.log(`range: ${range}`);
-  const timestamp = Utilities.formatDate(new Date(), "America/Los_Angeles", "MM/dd/yyyy HH:mm:ss");
-  console.log(`timestamp: ${timestamp}`);
-  users.getRange(range).setValue(timestamp);
-}
-
 async function loadUserTurf(employer = 'OHA - Salem | OHA | Oregon State Hospital', userEmail) {
   console.log(`loadUserTurf.gs > 6, employer: ${employer}`);
   let records;
@@ -213,12 +188,6 @@ async function setUserTurf(employerName, payload) {
     } catch (err) {
       logErrorFunctions('setUserTurf: UPDATE', indicesOfRowsToUpdate, newRowsToAppend, err);
     } 
-    }
-    
-    try {
-      updateLoadTurfTimestamp(userEmail);
-    } catch (err) {
-      logErrorFunctions('updateLoadTurfTimestamp', [userEmail], '', err);
     }
            
     }
