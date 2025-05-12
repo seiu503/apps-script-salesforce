@@ -9,6 +9,7 @@ async function getUserByEmail(email) {
     qp.setWhere(`Email = \'${email}\' AND profileID__c = '00eRt0000018i89'`);
     try {
       const records = get(qp);
+      console.log('getUser payload:');
       console.log(records);
       await setUser(records);
       return{
@@ -83,7 +84,8 @@ async function setUser(payload) {
     }
   } else {
     // otherwise, delete existing user and replace it with fresh data from Salesforce
-    console.log(`setUser > 34: found matching user, deleting and replacing`);
+    console.log(`setUser > 34: found matching user, deleting and replacing with this payload`);
+    console.log(payload);
     try {
       users.deleteRow(userRowIndex);
       // append new rows with data from paylod from getUser function

@@ -150,6 +150,7 @@ const logErrorFunctions = (functionName, input, output, error) => {
   console.log('Output:');
   console.log(output);
   throw checkError;
+  return {Success: false, Error: checkError}
 };
 
 // format date for submission to SF

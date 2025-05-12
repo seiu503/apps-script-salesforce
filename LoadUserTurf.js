@@ -11,7 +11,7 @@ const contactIds = workers.getRange("A2:A").getValues().flat().filter(Boolean);
 // const employer = 'Employment - Salem | OED | Employment Building' || 'OHA - Salem | OHA | Oregon State Hospita; // test data
 // const employer = 'Beaverton | DHS | Greenbrier Parkway'; // test data
 
-async function loadUserTurf(employer = 'OHA - Salem | OHA | Oregon State Hospital', userEmail) {
+async function loadUserTurf(employer = 'ODOT - Portland | ODOT | Region 1 Headquarters') {
   console.log(`loadUserTurf.gs > 6, employer: ${employer}`);
   let records;
   if (employer) {
@@ -81,6 +81,7 @@ async function setUserTurf(employerName, payload) {
     console.log('just add new rows')
     try {
       appendNewRows(payload, workers);
+      return {Success: true, Error: null}
     } catch (err) {
       logErrorFunctions('setUserTurf: ALL NEW', turfIndices, '', err);
     }
@@ -136,41 +137,53 @@ async function setUserTurf(employerName, payload) {
       
 
     // identify rows to UPDATE
-    const intersection = payload.filter(x => contactIds.includes(x.Id)); // values in both arrays
-    console.log('intersection');
-    console.log(intersection.length);
+    const intersectionIncoming = payload.filter(x => contactIds.includes(x.Id)); // new data rows that are already in google sheet
+    const intersectionExisting = allData.filter((x, sheetIndex) => {
+      if (payloadContactIds.includes(x[0])) {
+        x.push(sheetIndex);
+        return true;
+      }
+   }) // google sheet rows that are in newData, with original sheet index as last item in array
+    // console.log('intersectionIncoming');
+    // console.log(intersectionIncoming);
+    // console.log('intersectionExisting'); 
+    // console.log(intersectionExisting);
     // check whether any of these rows are different
     let indicesOfRowsToUpdate = [];
     let newRowsToAppend = [];
     // console.log('179');
     // console.log(`turfRows`);
     // console.log(turfRows);
-    turfRows.forEach((turfRow, index) => {
-      // console.log(`178: ${index}`);
-      // console.log('182: turfRow');
+    intersectionExisting.forEach((turfRow) => {
+      // console.log('160: turfRow');
       // console.log(turfRow);
       // console.log(`turfRow[0]: ${turfRow[0]}`);
-      const matchingRowInPayload = intersection.find(payloadRow => payloadRow.Id === turfRow[0]);
+      const origIndex = turfRow.pop();
+      // console.log(`origIndex: ${origIndex}`);
+      const matchingRowInPayload = intersectionIncoming.find(payloadRow => payloadRow.Id === turfRow[0]);
       if (matchingRowInPayload) {
+        // console.log(`MATCH: matchingRowInPayload:` );
+        // console.log(matchingRowInPayload);
         const slicedArray = Object.values(matchingRowInPayload).slice(1);
-        // if (turfRow[0] === '003Rf000000Q3ITIA0') {
-        //   console.log('turfRow');
-        //   console.log(turfRow);
-        //   console.log('slicedArray');
-        //   console.log(slicedArray);
-        // }
+        // console.log(`slicedArray`);
+        // console.log(slicedArray);
+        // console.log(`turfRow`);
+        // console.log(turfRow);
         if ( turfRow.every((cell, i) => looserEqual(slicedArray[i], cell))) { 
-          // console.log(`180: MATCH ${index + 1}`);
+          console.log(`180: MATCH ${origIndex + 1}`);
         } else {
-          console.log(`185: NOMATCH ${index + 1}`);
-          console.log('turfRow');
-          console.log(turfRow);
-          console.log('slicedArray');
-          console.log(slicedArray);
+          console.log(`185: NOMATCH ${origIndex + 1}`);
+          // console.log('turfRow');
+          // console.log(turfRow);
+          // console.log('slicedArray');
+          // console.log(slicedArray);
           // this means the row that matched on contact ID DOES NOT match entirely (eg other data is new) and needs to be updated
-          indicesOfRowsToUpdate.push(index + 1);
+          // need to find the index of this row *in the google sheet*, not in the incoming payload array
+          indicesOfRowsToUpdate.push(origIndex + 1);
           newRowsToAppend.push(Object.values(matchingRowInPayload));
         }
+      } else {
+        console.log('no matching row found')
       }
       
     });
@@ -189,6 +202,14 @@ async function setUserTurf(employerName, payload) {
       logErrorFunctions('setUserTurf: UPDATE', indicesOfRowsToUpdate, newRowsToAppend, err);
     } 
     }
-           
+
+    // remove duplicates
+    console.log('removing dupes');
+    const sheetId = workers.getSheetId();
+    console.log(`sheetId: ${sheetId}`);
+    const resource = { requests: [{ deleteDuplicates: { range: { sheetId } } }] };
+    Sheets.Spreadsheets.batchUpdate(resource, ss.getId());
+    SpreadsheetApp.flush();
+    return {Success: true}       
     }
   }
