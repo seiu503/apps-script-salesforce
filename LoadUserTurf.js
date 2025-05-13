@@ -29,15 +29,20 @@ async function loadUserTurf(employer = 'ODOT - Portland | ODOT | Region 1 Headqu
       } else {
         console.log(`no records returned for ${employer}`);
       }
-      
 
-      setUserTurf(employer, records);
+      await setUserTurf(employer, records);
+      return {
+        Success: true,
+        Error: null
+        }       
+
     } catch (err) {
       logErrorFunctions('loadUserTurf', employer, records, err);
     }
 
   } else {
     console.log(`loadUserTurf > 24: no employer provided`);
+    logErrorFunctions('loadUserTurf', employer, records, 'No employer provided');
   }
   
 }
@@ -210,6 +215,5 @@ async function setUserTurf(employerName, payload) {
     const resource = { requests: [{ deleteDuplicates: { range: { sheetId } } }] };
     Sheets.Spreadsheets.batchUpdate(resource, ss.getId());
     SpreadsheetApp.flush();
-    return {Success: true}       
-    }
   }
+}
