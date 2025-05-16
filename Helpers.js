@@ -171,8 +171,18 @@ function isNullOrEmpty(value) {
   return value === null || value === "";
 }
 
+const looseDatesEqual = (first, second) => {
+  const date1 = new Date(first);
+  const date2 = new Date(second);
+  return (
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getDate() === date2.getDate()
+  )
+};
+
 function looserEqual(valA, valB) {
-  if ((valA == valB) || (isNullOrEmpty(valA) && isNullOrEmpty(valB))) {
+  if ((valA == valB) || (isNullOrEmpty(valA) && isNullOrEmpty(valB)) || looseDatesEqual(valA, valB)) {
     return true;
   } else {
     return false;

@@ -56,6 +56,26 @@ async function getCAsByCampaign() {
   
 }
 
+function appendNewRowsSW(data, sheet) {
+  console.log('appendNewRowsSW');
+  try {
+    const values = data.reduce((ar, obj) => {
+      if (!CAIds.includes(obj.Id)) {
+        const row = Object.values(obj).slice(1);
+        ar.push(row);
+      }
+      return ar;
+    }, []);
+  if (values && values.length) {
+      sheet.getRange(sheet.getLastRow() + 1, 1, values.length, values[0].length).setValues(values);
+    } else {
+      logErrorFunctions('appendNewRowsSW', [data, sheet], '', 'No values passed to appendNewRowsSW');
+    }
+  } catch (err) {
+    logErrorFunctions('appendNewRowsSW', [data, sheet], '', err);
+  }
+}
+
 async function setCAs(payload) {
   console.log(`setCAs`);
   const allData = swWorkers.getDataRange().getValues();
@@ -102,7 +122,7 @@ async function setCAs(payload) {
   console.log(rowsToAdd.length);
   if (rowsToAdd && rowsToAdd.length) {
     try {
-      appendNewRows(rowsToAdd, swWorkers);
+      appendNewRowsSW(rowsToAdd, swWorkers);
     } catch (err) {
       logErrorFunctions('setCAs: ADD', payloadCAIds, rowsToAdd, err);
     }
@@ -141,13 +161,13 @@ async function setCAs(payload) {
       // console.log(`sheetRow`);
       // console.log(sheetRow);
       if ( sheetRow.every((cell, i) => looserEqual(slicedArray[i], cell))) { 
-        console.log(`180: MATCH ${origIndex + 1}`);
+        // console.log(`180: MATCH ${origIndex + 1}`);
       } else {
         console.log(`185: NOMATCH ${origIndex + 1}`);
-        // console.log('turfRow');
-        // console.log(turfRow);
-        // console.log('slicedArray');
-        // console.log(slicedArray);
+        console.log('sheetRow');
+        console.log(sheetRow);
+        console.log('slicedArray');
+        console.log(slicedArray);
         // this means the row that matched on contact ID DOES NOT match entirely (eg other data is new) and needs to be updated
         // need to find the index of this row *in the google sheet*, not in the incoming payload array
         indicesOfRowsToUpdate.push(origIndex + 1);
@@ -158,17 +178,15 @@ async function setCAs(payload) {
     }
     
   });
-  console.log('newRowsToAppend 161');
-  console.log(newRowsToAppend.length);
-  console.log('indicesOfRowsToUpdate 163');
-  console.log(indicesOfRowsToUpdate);
+  console.log(`newRowsToAppend 161: ${newRowsToAppend.length}`);
+  console.log(`indicesOfRowsToUpdate 163: ${indicesOfRowsToUpdate.length}`);
   if (newRowsToAppend && newRowsToAppend.length && indicesOfRowsToUpdate && indicesOfRowsToUpdate.length) {
     try {
     const sheetId = swWorkers.getSheetId();
     const requests = indicesOfRowsToUpdate.reverse().map(e => ({ deleteDimension: { range: { sheetId, startIndex: e - 1, endIndex: e, dimension: "ROWS" } } }));
     Sheets.Spreadsheets.batchUpdate({ requests }, swss.getId());
     SpreadsheetApp.flush();
-    appendNewRows(newRowsToAppend, workers);
+    appendNewRowsSW(newRowsToAppend, workers);
   } catch (err) {
     logErrorFunctions('setCAs: UPDATE', indicesOfRowsToUpdate, newRowsToAppend, err);
   } 
