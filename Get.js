@@ -5,10 +5,10 @@
  *                                  must at least specify the SELECT and FROM clauses
  * @return {obj} the queried data from Salesforce
  */
-const get = (queryParameters, apiVersion) => {
+const get = (queryParameters, apiVersion, env) => {
   // console.log('Get.gs > 9');
   // console.log(queryParameters);
-  return fetch_({ method: METHODS.GET, queryParameters, apiVersion });
+  return fetch_({ method: METHODS.GET, queryParameters, apiVersion, env });
 }
 Object.defineProperty(this, 'get', {value: get, enumerable : true});
 // ['SELECT', 'FROM', 'WHERE', 'GROUP BY', 'ORDER BY', 'LIMIT', 'OFFSET', 'HAVING']

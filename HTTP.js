@@ -56,6 +56,7 @@ const fetch_ = ({
   sObject = "",
   sObjectId = "",
   apiVersion = 50,
+  env = '',
 }) => {
   try {
     const endpoint = createEndpoint_({
@@ -66,14 +67,17 @@ const fetch_ = ({
       apiVersion,
       queryParameters,
     });
-    const accessTokenResponse = requestAccessToken_();
+    // console.log(`fetch_ 70: ${endpoint}`);
+    let accessTokenResponse;
+    if (env === 'prod') {
+      accessTokenResponse = requestAccessTokenProd_();
+    } else {
+      accessTokenResponse = requestAccessToken_();
+    }
     const accessToken = accessTokenResponse.access_token;
     const instanceUrl = accessTokenResponse.instance_url;
     const options = getOptions_({ accessToken, method, payload });
     let response = UrlFetchApp.fetch(instanceUrl + endpoint, options);
-    // console.log(`HTTP.gs > 74`);
-    // console.log(instanceUrl + endpoint);
-    // console.log(options);
     let json;
 
     if (method === METHODS.GET) {
@@ -99,9 +103,7 @@ const fetch_ = ({
 
       return records;
     } else {
-      console.log('HTTP.gs > 113');
       if (Object.keys(response).length > 0) {
-        console.log('HTTP.gs > 115');
         json = JSON.parse(response.toString());
         const hasEntries = json.length > 0;
         const hasErrorCode = hasEntries ? !!json[0].errorCode : false;
@@ -170,7 +172,7 @@ const getOptions_ = ({
     method: method,
     contentType: contentType,
     headers: headers,
-    muteHttpExceptions: true,
+    muteHttpExceptions: false,
   };
 
   if (method === METHODS.PATCH || method === METHODS.POST) {
