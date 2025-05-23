@@ -199,8 +199,6 @@ function generateUID(len) {
 }
 
 function arrayToSFMultiSelectPicklist(array) {
-  console.log(`arrayToSFMultiSelectPicklist: 202`);
-  console.log(array)
   if (!array || !array.length) {
     return '';
   };
@@ -212,6 +210,11 @@ function arrayToSFMultiSelectPicklist(array) {
       outputString += `; ${item}`;        
     }
   });
-  console.log(`outputString: ${outputString}`);
+  // console.log(`outputString: ${outputString}`);
   return outputString;
+}
+
+function isEmpty(obj) {
+  for(var i in obj) { return false; }
+  return true;
 }

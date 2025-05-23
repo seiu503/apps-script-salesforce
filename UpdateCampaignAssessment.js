@@ -1,4 +1,5 @@
-async function createNewCampaignAssessment(
+async function updateCampaignAssessment(
+  Id,
   First_name_from_form__c, 
   Preferred_Name_from_Form__c,
   Pronouns__c,
@@ -18,15 +19,17 @@ async function createNewCampaignAssessment(
   Student_Clubs__c,
   Student_Major__c,
   Relationships__c,
-  Potential_Leader__c) {
-  // First_name_from_form__c = 'testFirst', 
-  // Preferred_Name_from_Form__c = 'testNickname',
-  // Pronouns__c = 'She/Her',
-  // Last_Name_from_form__c = 'testLast',
-  // Email_from_form__c = 'test@test.com', 
+  Potential_Leader__c,
+  In_Unit__c) {
+  // Id = 'a2RRt000000qHZRMA2',
+  // First_name_from_form__c = 'updatedFirst', 
+  // Preferred_Name_from_Form__c = 'updatedNickname',
+  // Pronouns__c = 'He/Him',
+  // Last_Name_from_form__c = 'updatedLast',
+  // Email_from_form__c = 'updated@test.com', 
   // AGENCY_from_form__c = 'Portland State University', 
   // Department__c = 'TLC The Learning Center Svcs',
-  // Job_Title__c =  'Test job title', 
+  // Job_Title__c =  'Updated job title', 
   // Willing_to_Help__c = true, 
   // Preferred_Language_from_form__c = 'English', 
   // Phone_from_form__c = '5035551212', 
@@ -38,7 +41,8 @@ async function createNewCampaignAssessment(
   // Student_Clubs__c = ['American Sign Language (ASL)','Anime Club'],
   // Student_Major__c = 'Arts & Letters',
   // Relationships__c = 'relationship notes',
-  // Potential_Leader__c = true) {
+  // Potential_Leader__c = false,
+  // In_Unit__c = false) {
 
   const body = {
     First_name_from_form__c, 
@@ -61,22 +65,22 @@ async function createNewCampaignAssessment(
     Student_Major__c,
     Relationships__c,
     Potential_Leader__c,
-    In_Unit__c: true,
-    RecordTypeId: '012Rf000002kYiIIAU', // External Campaigns
-    Campaign_Name_Picklist__c: 'Student Workers',
-    Employer_Lookup__c: '001Rt00000tUA2lIAG' // SWO - Unknown
+    In_Unit__c
   };
 
 
-  console.log(`createNewCampaignAssessment.gs > 74}`);
+  console.log(`updateCampaignAssessment.gs > 72}`);
   console.log(body);
 
   if (body) {
     try {
-      await insert({ 
+      await update({ 
         sObject: 'Higher_Ed_Strike_Pledge__c', 
-        payload: { ...body }
-        })
+        sObjectId: Id,
+        payload: { ...body },
+        apiVersion: '50', 
+        env: 'staging'
+        });
 
       return {
         Success: true,
@@ -84,19 +88,19 @@ async function createNewCampaignAssessment(
       }  
 
     } catch (err) {
-      logErrorFunctions('createNewCampaignAssessment', {body}, '', err);
+      logErrorFunctions('updateCampaignAssessment', {body}, '', err);
       return {
         Success: false,
-        Error: `There was an error creating the worker, please contact the app administrator. ${err}`
+        Error: `There was an error updating the worker, please contact the app administrator. ${err}`
       }
     }
 
   } else {
-    console.log(`test.gs > createNewCampaignAssessment: no body`);
-    logErrorFunctions('createNewCampaignAssessment', {body}, '', err);
+    console.log(`test.gs > updateCampaignAssessment: no body`);
+    logErrorFunctions('updateCampaignAssessment', {body}, '', err);
     return {
         Success: false,
-        Error: `There was an error creating the worker, please contact the app administrator. No body provided to insert function.`
+        Error: `There was an error updating the worker, please contact the app administrator. No body provided to insert function.`
       }
   }
 }

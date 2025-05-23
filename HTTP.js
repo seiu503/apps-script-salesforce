@@ -103,7 +103,12 @@ const fetch_ = ({
 
       return records;
     } else {
-      if (Object.keys(response).length > 0) {
+      console.log(`HTTP: 106: response @@@@@@@@@@@@@@@@@@@@@@@@`);
+      console.log(response);
+      const parsedResponse = JSON.parse(JSON.stringify(response));
+      console.log(`parsedResponse`);
+      console.log(parsedResponse);
+      if (!isEmpty(parsedResponse)) {
         json = JSON.parse(response.toString());
         const hasEntries = json.length > 0;
         const hasErrorCode = hasEntries ? !!json[0].errorCode : false;
@@ -135,6 +140,7 @@ const createEndpoint_ = ({
   apiVersion,
 }) => {
   let endpoint = URL_BEGINNING + apiVersion + ".0/";
+  console.log(`http.gs > 138: endpoint: ${endpoint}`);
 
   switch (method) {
     case METHODS.GET:
@@ -155,7 +161,7 @@ const createEndpoint_ = ({
     default:
       endpoint += "";
   }
-
+  // console.log(`http.gs > 159: endpoint: ${endpoint}`);
   return endpoint;
 };
 
@@ -175,10 +181,15 @@ const getOptions_ = ({
     muteHttpExceptions: false,
   };
 
+  // console.log('http.gs > 179: payload:');
+  // console.log(payload);
+  console.log(JSON.stringify(payload));
+
   if (method === METHODS.PATCH || method === METHODS.POST) {
     options.payload = JSON.stringify(payload);
   }
-
+  // console.log('http.gs > 182: options:');
+  // console.log(options);
   return options;
 };
 
@@ -213,6 +224,6 @@ const createSoqlQuery_ = (queryParameters) => {
     // if a parameter is not included, it is skipped
     query += ifFalsy(parameter, "", clause + parameter);
   }
-
+  console.log(`http.gs > 217: query: ${query}`);
   return query;
 };

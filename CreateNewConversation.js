@@ -1,20 +1,20 @@
 async function createNewConversation(
-  Campaign_Assessment__c = 'a2RRt000000pii9MAA', 
-  External_Organizer_MLDP__c = '005Rt00000H9KCFIA3',
-  Source__c = 'Tabling',
-  Assessment__c = '2',
-  Notes__c = 'Notes test',
-  Conversation_Result__c = "Card Ask: Signed",
-  Issues__c = ['Pay', 'Respect'],
-  Follow_up__c = ['Set up meeting', 'Other']) {
-  // Campaign_Assessment__c, 
-  // External_Organizer_MLDP__c,
-  // Source__c,
-  // Assessment__c,
-  // Notes__c,
-  // Conversation_Result__c,
-  // Issues__c,
-  // Follow_up__c) {
+  // Campaign_Assessment__c = 'a2RRt000000pii9MAA', 
+  // External_Organizer_MLDP__c = '005Rt00000H9KCFIA3',
+  // Source__c = 'Tabling',
+  // Assessment__c = '2',
+  // Notes__c = 'Notes test',
+  // Conversation_Result__c = "Card Ask: Signed",
+  // Issues__c = ['Pay', 'Respect'],
+  // Follow_up__c = ['Set up meeting', 'Other']) {
+  Campaign_Assessment__c, 
+  External_Organizer_MLDP__c,
+  Source__c,
+  Assessment__c,
+  Notes__c,
+  Conversation_Result__c,
+  Issues__c,
+  Follow_up__c) {
   console.log(`createNewConversation.gs > 2, createNewConversation`);
 
   let today = formatSFDate(new Date());
