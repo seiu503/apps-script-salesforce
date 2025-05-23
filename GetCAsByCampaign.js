@@ -1,6 +1,8 @@
 const CAfieldsArray = [
   'Id', 
   'First_name_from_form__c', 
+  'Preferred_Name_from_Form__c',
+  'Pronouns__c',
   'Last_Name_from_form__c',
   'Email_from_form__c', 
   'AGENCY_from_form__c', 
@@ -14,7 +16,13 @@ const CAfieldsArray = [
   'Address__c',
   'City__c',
   'State__c',
-  'ZIP__c'
+  'ZIP__c',
+  'Department_Lookup__c',
+  'Student_Clubs__c',
+  'Student_Major__c',
+  'Relationships__c',
+  'Potential_Leader__c',
+  'In_Unit__c'
   ];
 const swss = SpreadsheetApp.openByUrl(
     'https://docs.google.com/spreadsheets/d/14a5ZRXFbAl69VQ98aJ1lCnWLcfh3mhZrKpsxAT01btA/edit',
@@ -34,7 +42,8 @@ async function getCAsByCampaign() {
       qp.setFrom("Higher_Ed_Strike_Pledge__c");
       qp.setWhere(`Campaign_Name_Picklist__c = 'Student Workers'`);
 
-      records = await get(qp, '50', 'prod');
+      // add 'prod' as 3d argument to get() to get from production; otherwise gets records from 503admin sandbox
+      records = await get(qp, '50');
       if (records && records.length) {
         console.log(`${records.length} records returned`);
         // console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');

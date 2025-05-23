@@ -188,3 +188,30 @@ function looserEqual(valA, valB) {
     return false;
   }
 }
+
+function generateUID(len) {
+  const alpha = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let id = '';
+  for (let i = 0; i < len; i++) {
+    id += alpha.charAt(Math.floor(Math.random() * alpha.length));
+  }
+  return id;
+}
+
+function arrayToSFMultiSelectPicklist(array) {
+  console.log(`arrayToSFMultiSelectPicklist: 202`);
+  console.log(array)
+  if (!array || !array.length) {
+    return '';
+  };
+  let outputString = '';
+  array.forEach(item => {
+    if (outputString === "") {
+      outputString = item;
+    } else {
+      outputString += `; ${item}`;        
+    }
+  });
+  console.log(`outputString: ${outputString}`);
+  return outputString;
+}

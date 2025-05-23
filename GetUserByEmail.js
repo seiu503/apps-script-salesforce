@@ -6,7 +6,7 @@ async function getUserByEmail(email) {
     const qp = new QueryParameters();
     qp.setSelect("Id, ContactId, Salutation_Last__c, Salutation_Name__c, Email, AppSheetTurf__c");
     qp.setFrom("User");
-    qp.setWhere(`Email = \'${email}\' AND profileID__c = '00eRt0000018i89'`);
+    qp.setWhere(`Email = \'${email}\' AND profileID__c = '00eRf000009g4rd'`); // customer community login SEIU 503 -- may need to change for production
     try {
       const records = get(qp);
       console.log('getUser payload:');
