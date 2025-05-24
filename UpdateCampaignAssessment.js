@@ -42,7 +42,8 @@ async function updateCampaignAssessment(
   // Student_Major__c = 'Arts & Letters',
   // Relationships__c = 'relationship notes',
   // Potential_Leader__c = false,
-  // In_Unit__c = false) {
+  // In_Unit__c = false,
+  // AppSheet_ID__c = '12345678') {
 
   const body = {
     First_name_from_form__c, 
@@ -62,22 +63,27 @@ async function updateCampaignAssessment(
     ZIP__c,
     Department_Lookup__c,
     Student_Clubs__c: arrayToSFMultiSelectPicklist(Student_Clubs__c),
-    Student_Major__c,
+    Student_Major__c: arrayToSFMultiSelectPicklist(Student_Major__c),
     Relationships__c,
     Potential_Leader__c,
-    In_Unit__c
+    In_Unit__c,
+    AppSheet_ID__c
   };
 
 
   console.log(`updateCampaignAssessment.gs > 72}`);
   console.log(body);
+  
+  const cleanBody = removeNullValues(body);
+  console.log('cleanBody');
+  console.log(cleanBody);
 
-  if (body) {
+  if (cleanBody) {
     try {
       await update({ 
         sObject: 'Higher_Ed_Strike_Pledge__c', 
         sObjectId: Id,
-        payload: { ...body },
+        payload: { ...cleanBody },
         apiVersion: '50', 
         env: 'staging'
         });
@@ -88,7 +94,7 @@ async function updateCampaignAssessment(
       }  
 
     } catch (err) {
-      logErrorFunctions('updateCampaignAssessment', {body}, '', err);
+      logErrorFunctions('updateCampaignAssessment', {body}, {cleanBody}, err);
       return {
         Success: false,
         Error: `There was an error updating the worker, please contact the app administrator. ${err}`
@@ -97,7 +103,7 @@ async function updateCampaignAssessment(
 
   } else {
     console.log(`test.gs > updateCampaignAssessment: no body`);
-    logErrorFunctions('updateCampaignAssessment', {body}, '', err);
+    logErrorFunctions('updateCampaignAssessment', {body}, {cleanBody}, err);
     return {
         Success: false,
         Error: `There was an error updating the worker, please contact the app administrator. No body provided to insert function.`

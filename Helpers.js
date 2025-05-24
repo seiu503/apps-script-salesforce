@@ -153,7 +153,12 @@ const logErrorFunctions = (functionName, input, output, error) => {
   return {Success: false, Error: checkError}
 };
 
-// format date for submission to SF
+/**
+ * formats a date for submission to Salesforce.
+ *
+ * @param {string, object} a date expressed as a string or Date object
+ * @return {string} the date converted to a string in format YYYY-MM-DD
+ */
 formatSFDate = date => {
   let d = new Date(date),
     month = "" + (d.getMonth() + 1),
@@ -217,4 +222,39 @@ function arrayToSFMultiSelectPicklist(array) {
 function isEmpty(obj) {
   for(var i in obj) { return false; }
   return true;
+}
+
+function removeNullValues(obj) {
+  for (const key in obj) {
+    if (obj[key] === null) {
+      delete obj[key];
+    } else if (typeof obj[key] === 'object') {
+      removeNullValues(obj[key]); // Recursively handle nested objects
+    }
+  }
+  return obj;
+}
+
+function isEmptyRow(row){
+  for (var columnIndex = 0; columnIndex < row.length; columnIndex++){
+    var cell = row[columnIndex];
+    if (cell){
+      return false;
+    }
+  }
+  return true;
+}
+
+function removeEmptyRows(sheet){
+  var range = sheet.getDataRange();
+  var data = range.getValues();
+
+  for (var rowIndex = data.length - 1; rowIndex >= 0; rowIndex--){
+    var row = data[rowIndex];
+
+    if (isEmptyRow(row)){
+      sheet.deleteRow(rowIndex + 1);
+    }
+  }
+
 }

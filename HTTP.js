@@ -79,7 +79,9 @@ const fetch_ = ({
     const options = getOptions_({ accessToken, method, payload });
     let response = UrlFetchApp.fetch(instanceUrl + endpoint, options);
     let json;
-
+    // console.log(`HTTP: 82: response ========&&&&&&&&&&&&&&&&&&&&&============`);
+    // console.log(response);
+    // console.log(response.getContentText());
     if (method === METHODS.GET) {
       json = JSON.parse(response.toString());
       // console.log(`HTTP.gs > 80`);
@@ -103,26 +105,15 @@ const fetch_ = ({
 
       return records;
     } else {
-      console.log(`HTTP: 106: response @@@@@@@@@@@@@@@@@@@@@@@@`);
-      console.log(response);
-      const parsedResponse = JSON.parse(JSON.stringify(response));
-      console.log(`parsedResponse`);
-      console.log(parsedResponse);
-      if (!isEmpty(parsedResponse)) {
-        json = JSON.parse(response.toString());
-        const hasEntries = json.length > 0;
-        const hasErrorCode = hasEntries ? !!json[0].errorCode : false;
-
-        if (json.hasErrors || hasErrorCode) {
+      const respObject = response.getContentText();
+      if (respObject.errors && respObject.errors.length || respObject.errorCode) {
           console.log("--- error1 --- HTTP.gs > 109");
-          console.log(JSON.stringify(json));
-          logErrorFunctions('fetch_', '', '', JSON.stringify(json));
-        } else console.log(json);
-
-        return json;
-      } else {
-        console.log("Success!!! HTTP.gs > 127");
-      }
+          logErrorFunctions('fetch_', '', '', JSON.stringify(respObject));
+        } else {
+          console.log('HTTP.gs > 113');
+          console.log(respObject);
+          return respObject;
+        }
     }
   } catch (error) {
     console.log("--- error2 --- HTTP.gs > 120");

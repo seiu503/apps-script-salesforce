@@ -2,8 +2,8 @@ const CAfieldsArray = [
   'Id', 
   'First_name_from_form__c', 
   'Preferred_Name_from_Form__c',
-  'Pronouns__c',
   'Last_Name_from_form__c',
+  'Pronouns__c',
   'Email_from_form__c', 
   'AGENCY_from_form__c', 
   'Department__c',
@@ -22,7 +22,8 @@ const CAfieldsArray = [
   'Student_Major__c',
   'Relationships__c',
   'Potential_Leader__c',
-  'In_Unit__c'
+  'In_Unit__c',
+  'AppSheet_ID__c'
   ];
 const swss = SpreadsheetApp.openByUrl(
     'https://docs.google.com/spreadsheets/d/14a5ZRXFbAl69VQ98aJ1lCnWLcfh3mhZrKpsxAT01btA/edit',
@@ -172,11 +173,11 @@ async function setCAs(payload) {
       if ( sheetRow.every((cell, i) => looserEqual(slicedArray[i], cell))) { 
         // console.log(`180: MATCH ${origIndex + 1}`);
       } else {
-        console.log(`185: NOMATCH ${origIndex + 1}`);
-        console.log('sheetRow');
-        console.log(sheetRow);
-        console.log('slicedArray');
-        console.log(slicedArray);
+        // console.log(`185: NOMATCH ${origIndex + 1}`);
+        // console.log('sheetRow');
+        // console.log(sheetRow);
+        // console.log('slicedArray');
+        // console.log(slicedArray);
         // this means the row that matched on contact ID DOES NOT match entirely (eg other data is new) and needs to be updated
         // need to find the index of this row *in the google sheet*, not in the incoming payload array
         indicesOfRowsToUpdate.push(origIndex + 1);
@@ -197,15 +198,18 @@ async function setCAs(payload) {
     SpreadsheetApp.flush();
     appendNewRowsSW(newRowsToAppend, workers);
   } catch (err) {
-    logErrorFunctions('setCAs: UPDATE', indicesOfRowsToUpdate, newRowsToAppend, err);
+    logErrorFunctions('setCAs: UPDATE', indicesOfRowsToUpdate, newRowsToAppend.length, err);
   } 
   }
 
-  // remove duplicates
-  console.log('removing dupes');
-  const sheetId = swWorkers.getSheetId();
-  console.log(`sheetId: ${sheetId}`);
-  const resource = { requests: [{ deleteDuplicates: { range: { sheetId } } }] };
-  Sheets.Spreadsheets.batchUpdate(resource, swss.getId());
-  SpreadsheetApp.flush();
+  // remove duplicates -- this is failing? not sure why, commenting out for now
+  // console.log('removing dupes');
+  // const sheetId = swWorkers.getSheetId();
+  // console.log(`sheetId: ${sheetId}`);
+  // const resource = { requests: [{ deleteDuplicates: { range: { sheetId } } }] };
+  // Sheets.Spreadsheets.batchUpdate(resource, swss.getId());
+  // SpreadsheetApp.flush();
+
+  // remove empty rows
+  removeEmptyRows(swWorkers);
 }
