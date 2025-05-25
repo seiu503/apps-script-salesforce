@@ -215,6 +215,6 @@ const createSoqlQuery_ = (queryParameters) => {
     // if a parameter is not included, it is skipped
     query += ifFalsy(parameter, "", clause + parameter);
   }
-  console.log(`http.gs > 217: query: ${query}`);
+  // console.log(`http.gs > 217: query: ${query}`);
   return query;
 };

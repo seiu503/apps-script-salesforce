@@ -53,7 +53,7 @@ async function getCAsByCampaign() {
         console.log(`no records returned`);
       }
 
-      await setCAs(records);
+      setCAsSimple(records);
       return {
         Success: true,
         Error: null
@@ -84,6 +84,41 @@ function appendNewRowsSW(data, sheet) {
   } catch (err) {
     logErrorFunctions('appendNewRowsSW', [data, sheet], '', err);
   }
+}
+
+function appendNewRowsSimple(data, sheet) {
+  const values = data.reduce((ar, obj) => {
+      ar.push(Object.values(obj).slice(1));
+      return ar;
+    }, []);
+
+  if (values && values.length) {
+  //   for (i = 0; i <= values.length; i++) {
+  //     if (values[i] && values[i].length) {
+  //       sheet.appendRow(values[i]);
+  //     }
+  //   }
+  //   return;
+  // ^^ that takes more than 30 seconds lol
+      // values.forEach(row => {
+      //   sheet.appendRow(row)
+      // })
+
+   const last = sheet.getLastRow();
+   console.log(`last: ${last}`);
+   console.log(`sheet.getMaxRows(): ${sheet.getMaxRows()}`);
+   if (last === sheet.getMaxRows()) {
+    console.log('last === sheet.getMaxRows');
+    console.log('inserting row after last');
+    sheet.insertRowAfter(last);
+   }
+   console.log('getCAs By Campaign > 114');
+   console.log('sheet.getLastRow() + 1');
+   console.log(sheet.getLastRow() + 1);
+   sheet.getRange(sheet.getLastRow() + 1, 1, values.length, values[0].length).setValues(values);
+    } else {
+      logErrorFunctions('appendNewRowsSimple', [data, sheet], '', 'No data passed to appendNewRowsSimple');
+    }
 }
 
 async function setCAs(payload) {
@@ -212,4 +247,48 @@ async function setCAs(payload) {
 
   // remove empty rows
   removeEmptyRows(swWorkers);
+}
+
+async function setCAsSimple(payload) {
+  console.log(`setCAsSimple`);
+  console.log(payload[0]);
+  
+  console.log('clear'); 
+  // clear all existing rows except header row, if there is more than one row in the sheet
+  if (swWorkers.getMaxRows() > 1) {
+    try {
+    // the below line works but is very slow  
+    // swWorkers.deleteRows(2,1,swWorkers.getLastRow(), swWorkers.getLastColumn()).setValue("");
+
+    swWorkers.getRange('A2:Y').clearContent(); // will need to sub 'Y' for last SF column if # of fields updates?
+
+    // the below is fast but leads to out of range errors when trying to write the new data, because all the rows are deleted
+    // const sheetId = swWorkers.getSheetId();
+    // const requests = [{
+    //   deleteDimension: {
+    //     range: {
+    //       sheetId,
+    //       startIndex: 1,
+    //       endIndex: swWorkers.getLastRow(),
+    //       dimension: "ROWS"
+    //     }
+    //   }
+    // }];
+    // Sheets.Spreadsheets.batchUpdate({ requests }, swss.getId());
+
+    } catch(err) {
+      logErrorFunctions('setCASimple: DELETE', '', '', err);
+    }
+  }
+  
+
+  console.log('add'); 
+  // add all rows from payload
+  try {
+    appendNewRowsSimple(payload, swWorkers);
+    return;
+  } catch (err) {
+    logErrorFunctions('setCASimple: ADD', payload, '', err);
+  }
+
 }
