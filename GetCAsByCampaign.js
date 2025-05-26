@@ -47,8 +47,6 @@ async function getCAsByCampaign() {
       records = await get(qp, '50');
       if (records && records.length) {
         console.log(`${records.length} records returned`);
-        // console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
-        // console.log(records[0]);
       } else {
         console.log(`no records returned`);
       }
@@ -60,30 +58,14 @@ async function getCAsByCampaign() {
         }       
 
     } catch (err) {
-      logErrorFunctions('getCAsByCampaign', null, records, err);
+      logErrorFunctions('getCAsByCampaign', null, records[0], err);
+      return {
+        Success: false,
+        Error: err
+      }
     }
 
   
-}
-
-function appendNewRowsSW(data, sheet) {
-  console.log('appendNewRowsSW');
-  try {
-    const values = data.reduce((ar, obj) => {
-      if (!CAIds.includes(obj.Id)) {
-        const row = Object.values(obj).slice(1);
-        ar.push(row);
-      }
-      return ar;
-    }, []);
-  if (values && values.length) {
-      sheet.getRange(sheet.getLastRow() + 1, 1, values.length, values[0].length).setValues(values);
-    } else {
-      logErrorFunctions('appendNewRowsSW', [data, sheet], '', 'No values passed to appendNewRowsSW');
-    }
-  } catch (err) {
-    logErrorFunctions('appendNewRowsSW', [data, sheet], '', err);
-  }
 }
 
 function appendNewRowsSimple(data, sheet) {
@@ -93,16 +75,6 @@ function appendNewRowsSimple(data, sheet) {
     }, []);
 
   if (values && values.length) {
-  //   for (i = 0; i <= values.length; i++) {
-  //     if (values[i] && values[i].length) {
-  //       sheet.appendRow(values[i]);
-  //     }
-  //   }
-  //   return;
-  // ^^ that takes more than 30 seconds lol
-      // values.forEach(row => {
-      //   sheet.appendRow(row)
-      // })
 
    const last = sheet.getLastRow();
    console.log(`last: ${last}`);
@@ -112,141 +84,10 @@ function appendNewRowsSimple(data, sheet) {
     console.log('inserting row after last');
     sheet.insertRowAfter(last);
    }
-   console.log('getCAs By Campaign > 114');
-   console.log('sheet.getLastRow() + 1');
-   console.log(sheet.getLastRow() + 1);
    sheet.getRange(sheet.getLastRow() + 1, 1, values.length, values[0].length).setValues(values);
     } else {
-      logErrorFunctions('appendNewRowsSimple', [data, sheet], '', 'No data passed to appendNewRowsSimple');
+      logErrorFunctions('appendNewRowsSimple', [data[0], sheet], '', 'No data passed to appendNewRowsSimple');
     }
-}
-
-async function setCAs(payload) {
-  console.log(`setCAs`);
-  const allData = swWorkers.getDataRange().getValues();
-  const payloadCAIds = payload.map(obj => obj.Id).filter(Boolean);
-  
-  console.log('diff sheet against new data'); 
-  let rowsToDelete = [];
-  let existingTurfcontactIds = [];
-  try {
-    // identify rows to DELETE
-    // values that are in existing sheet but not in payloadCAIds (new data)
-    sheetCAIds = allData.map((row, index) => [index + 1, row[0]]).slice(1).filter(Boolean); // 2D array containing the row index and the CA ID of each row
-    if (sheetCAIds.length) {
-      // console.log('sheetCAIds');
-      // console.log(sheetCAIds);
-      rowsToDelete = sheetCAIds.filter(x => {
-        // console.log(`133: ${x}`);
-        if (!payloadCAIds.includes(x[1])) {
-          return x[0]
-        }
-        }).filter(Boolean); // 1D array, just the indices of the rows to delete
-      console.log('rowsToDelete:');
-      console.log(rowsToDelete.length);
-      if (rowsToDelete && rowsToDelete.length) {
-        const indicesOfRowsToDelete = rowsToDelete.map(row => row[0]);
-        console.log(`indicesOfRowsToDelete - 84`);
-        console.log(indicesOfRowsToDelete);
-        const sheetId = swWorkers.getSheetId();
-        const requests = indicesOfRowsToDelete.reverse().map(e => ({ deleteDimension: { range: { sheetId, startIndex: e - 1, endIndex: e, dimension: "ROWS" } } }));
-        Sheets.Spreadsheets.batchUpdate({ requests }, swss.getId());
-        SpreadsheetApp.flush();
-      } 
-    }
-          
-  } catch(err) {
-    logErrorFunctions('setCAs: DELETE', sheetCAIds, rowsToDelete, err);
-  }
-
-
-  // identify rows to ADD
-  // values that are in new data (payloadCAIds) but not in existing sheet
-  const rowsToAdd = payload.filter(x => !CAIds.includes(x.Id)) // Array of objects returned from Salesforce whose contact Ids are not in Google sheet
-  console.log('rowsToAdd:');
-  console.log(rowsToAdd.length);
-  if (rowsToAdd && rowsToAdd.length) {
-    try {
-      appendNewRowsSW(rowsToAdd, swWorkers);
-    } catch (err) {
-      logErrorFunctions('setCAs: ADD', payloadCAIds, rowsToAdd, err);
-    }
-  }
-    
-
-  // identify rows to UPDATE
-  const intersectionIncoming = payload.filter(x => CAIds.includes(x.Id)); // new data rows that are already in google sheet
-  const intersectionExisting = allData.filter((x, sheetIndex) => {
-    if (payloadCAIds.includes(x[0])) {
-      x.push(sheetIndex);
-      return true;
-    }
-  }) // google sheet rows that are in newData, with original sheet index as last item in array
-  // console.log('intersectionIncoming');
-  // console.log(intersectionIncoming);
-  // console.log('intersectionExisting'); 
-  // console.log(intersectionExisting);
-  // check whether any of these rows are different
-  let indicesOfRowsToUpdate = [];
-  let newRowsToAppend = [];
-
-  intersectionExisting.forEach((sheetRow) => {
-    // console.log('160: sheetRow');
-    // console.log(sheetRow);
-    // console.log(`sheetRow[0]: ${sheetRow[0]}`);
-    const origIndex = sheetRow.pop();
-    // console.log(`origIndex: ${origIndex}`);
-    const matchingRowInPayload = intersectionIncoming.find(payloadRow => payloadRow.Id === sheetRow[0]);
-    if (matchingRowInPayload) {
-      // console.log(`MATCH: matchingRowInPayload:` );
-      // console.log(matchingRowInPayload);
-      const slicedArray = Object.values(matchingRowInPayload).slice(1);
-      // console.log(`slicedArray`);
-      // console.log(slicedArray);
-      // console.log(`sheetRow`);
-      // console.log(sheetRow);
-      if ( sheetRow.every((cell, i) => looserEqual(slicedArray[i], cell))) { 
-        // console.log(`180: MATCH ${origIndex + 1}`);
-      } else {
-        // console.log(`185: NOMATCH ${origIndex + 1}`);
-        // console.log('sheetRow');
-        // console.log(sheetRow);
-        // console.log('slicedArray');
-        // console.log(slicedArray);
-        // this means the row that matched on contact ID DOES NOT match entirely (eg other data is new) and needs to be updated
-        // need to find the index of this row *in the google sheet*, not in the incoming payload array
-        indicesOfRowsToUpdate.push(origIndex + 1);
-        newRowsToAppend.push(Object.values(matchingRowInPayload));
-      }
-    } else {
-      console.log('no matching row found')
-    }
-    
-  });
-  console.log(`newRowsToAppend 161: ${newRowsToAppend.length}`);
-  console.log(`indicesOfRowsToUpdate 163: ${indicesOfRowsToUpdate.length}`);
-  if (newRowsToAppend && newRowsToAppend.length && indicesOfRowsToUpdate && indicesOfRowsToUpdate.length) {
-    try {
-    const sheetId = swWorkers.getSheetId();
-    const requests = indicesOfRowsToUpdate.reverse().map(e => ({ deleteDimension: { range: { sheetId, startIndex: e - 1, endIndex: e, dimension: "ROWS" } } }));
-    Sheets.Spreadsheets.batchUpdate({ requests }, swss.getId());
-    SpreadsheetApp.flush();
-    appendNewRowsSW(newRowsToAppend, workers);
-  } catch (err) {
-    logErrorFunctions('setCAs: UPDATE', indicesOfRowsToUpdate, newRowsToAppend.length, err);
-  } 
-  }
-
-  // remove duplicates -- this is failing? not sure why, commenting out for now
-  // console.log('removing dupes');
-  // const sheetId = swWorkers.getSheetId();
-  // console.log(`sheetId: ${sheetId}`);
-  // const resource = { requests: [{ deleteDuplicates: { range: { sheetId } } }] };
-  // Sheets.Spreadsheets.batchUpdate(resource, swss.getId());
-  // SpreadsheetApp.flush();
-
-  // remove empty rows
-  removeEmptyRows(swWorkers);
 }
 
 async function setCAsSimple(payload) {
@@ -257,38 +98,19 @@ async function setCAsSimple(payload) {
   // clear all existing rows except header row, if there is more than one row in the sheet
   if (swWorkers.getMaxRows() > 1) {
     try {
-    // the below line works but is very slow  
-    // swWorkers.deleteRows(2,1,swWorkers.getLastRow(), swWorkers.getLastColumn()).setValue("");
-
     swWorkers.getRange('A2:Y').clearContent(); // will need to sub 'Y' for last SF column if # of fields updates?
-
-    // the below is fast but leads to out of range errors when trying to write the new data, because all the rows are deleted
-    // const sheetId = swWorkers.getSheetId();
-    // const requests = [{
-    //   deleteDimension: {
-    //     range: {
-    //       sheetId,
-    //       startIndex: 1,
-    //       endIndex: swWorkers.getLastRow(),
-    //       dimension: "ROWS"
-    //     }
-    //   }
-    // }];
-    // Sheets.Spreadsheets.batchUpdate({ requests }, swss.getId());
-
     } catch(err) {
       logErrorFunctions('setCASimple: DELETE', '', '', err);
     }
   }
   
-
   console.log('add'); 
   // add all rows from payload
   try {
     appendNewRowsSimple(payload, swWorkers);
     return;
   } catch (err) {
-    logErrorFunctions('setCASimple: ADD', payload, '', err);
+    logErrorFunctions('setCASimple: ADD', payload[0], '', err);
   }
 
 }

@@ -88,16 +88,16 @@ async function createNewCampaignAssessment(
       console.log(response);
 
       return {
-        Success: response.success,
-        Error: null,
-        Id: response.id
+        success: response.success,
+        errors: null,
+        id: response.id
       }  
 
     } catch (err) {
       logErrorFunctions('createNewCampaignAssessment', {body}, {cleanBody}, err);
       return {
-        Success: false,
-        Error: `There was an error creating the worker, please contact the app administrator. ${err}`
+        success: false,
+        errors: [`There was an error creating the worker, please contact the app administrator.`,err]
       }
     }
 
@@ -105,8 +105,8 @@ async function createNewCampaignAssessment(
     console.log(`test.gs > createNewCampaignAssessment: no body`);
     logErrorFunctions('createNewCampaignAssessment', {body}, {cleanBody}, err);
     return {
-        Success: false,
-        Error: `There was an error creating the worker, please contact the app administrator. No body provided to insert function.`
+        success: false,
+        errors: [`There was an error creating the worker, please contact the app administrator.`,'No body provided to insert function']
       }
   }
 }

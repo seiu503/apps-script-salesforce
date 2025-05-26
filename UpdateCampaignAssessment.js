@@ -20,7 +20,8 @@ async function updateCampaignAssessment(
   Student_Major__c,
   Relationships__c,
   Potential_Leader__c,
-  In_Unit__c) {
+  In_Unit__c,
+  AppSheet_ID__c) {
   // Id = 'a2RRt000000qHZRMA2',
   // First_name_from_form__c = 'updatedFirst', 
   // Preferred_Name_from_Form__c = 'updatedNickname',
@@ -80,7 +81,7 @@ async function updateCampaignAssessment(
 
   if (cleanBody) {
     try {
-      await update({ 
+      const response = await update({ 
         sObject: 'Higher_Ed_Strike_Pledge__c', 
         sObjectId: Id,
         payload: { ...cleanBody },
@@ -89,15 +90,15 @@ async function updateCampaignAssessment(
         });
 
       return {
-        Success: true,
-        Error: null
+        success: true,
+        errors: null
       }  
 
     } catch (err) {
       logErrorFunctions('updateCampaignAssessment', {body}, {cleanBody}, err);
       return {
-        Success: false,
-        Error: `There was an error updating the worker, please contact the app administrator. ${err}`
+        success: false,
+        errors: [`There was an error updating the worker, please contact the app administrator.`, err]
       }
     }
 
@@ -105,8 +106,8 @@ async function updateCampaignAssessment(
     console.log(`test.gs > updateCampaignAssessment: no body`);
     logErrorFunctions('updateCampaignAssessment', {body}, {cleanBody}, err);
     return {
-        Success: false,
-        Error: `There was an error updating the worker, please contact the app administrator. No body provided to insert function.`
+        success: false,
+        errors: [`There was an error updating the worker, please contact the app administrator.`, 'No body provided to insert function']
       }
   }
 }

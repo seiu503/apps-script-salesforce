@@ -131,7 +131,7 @@ const createEndpoint_ = ({
   apiVersion,
 }) => {
   let endpoint = URL_BEGINNING + apiVersion + ".0/";
-  console.log(`http.gs > 138: endpoint: ${endpoint}`);
+  // console.log(`http.gs > 138: endpoint: ${endpoint}`);
 
   switch (method) {
     case METHODS.GET:
@@ -174,7 +174,7 @@ const getOptions_ = ({
 
   // console.log('http.gs > 179: payload:');
   // console.log(payload);
-  console.log(JSON.stringify(payload));
+  // console.log(JSON.stringify(payload));
 
   if (method === METHODS.PATCH || method === METHODS.POST) {
     options.payload = JSON.stringify(payload);
