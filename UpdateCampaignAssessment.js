@@ -21,7 +21,8 @@ async function updateCampaignAssessment(
   Relationships__c,
   Potential_Leader__c,
   In_Unit__c,
-  AppSheet_ID__c) {
+  AppSheet_ID__c,
+  AppSheet_Department__c) {
   // Id = 'a2RRt000000qHZRMA2',
   // First_name_from_form__c = 'updatedFirst', 
   // Preferred_Name_from_Form__c = 'updatedNickname',
@@ -44,7 +45,8 @@ async function updateCampaignAssessment(
   // Relationships__c = 'relationship notes',
   // Potential_Leader__c = false,
   // In_Unit__c = false,
-  // AppSheet_ID__c = '12345678') {
+  // AppSheet_ID__c = '12345678',
+  // AppSheet_Department__c = 'a1WRt0000028WG5MAM') {
 
   const body = {
     First_name_from_form__c, 
@@ -68,7 +70,8 @@ async function updateCampaignAssessment(
     Relationships__c,
     Potential_Leader__c,
     In_Unit__c,
-    AppSheet_ID__c
+    AppSheet_ID__c,
+    AppSheet_Department__c
   };
 
 

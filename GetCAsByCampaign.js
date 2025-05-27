@@ -23,7 +23,8 @@ const CAfieldsArray = [
   'Relationships__c',
   'Potential_Leader__c',
   'In_Unit__c',
-  'AppSheet_ID__c'
+  'AppSheet_ID__c',
+  'AppSheet_Department__c'
   ];
 const swss = SpreadsheetApp.openByUrl(
     'https://docs.google.com/spreadsheets/d/14a5ZRXFbAl69VQ98aJ1lCnWLcfh3mhZrKpsxAT01btA/edit',
@@ -52,6 +53,11 @@ async function getCAsByCampaign() {
       }
 
       setCAsSimple(records);
+      try {
+        removeEmptyRows(swWorkers);
+      } catch(err) {
+        logErrorFunctions('getCAsByCampaign: removeEmptyRows', null, records[0], err);
+      }
       return {
         Success: true,
         Error: null
@@ -98,7 +104,7 @@ async function setCAsSimple(payload) {
   // clear all existing rows except header row, if there is more than one row in the sheet
   if (swWorkers.getMaxRows() > 1) {
     try {
-    swWorkers.getRange('A2:Y').clearContent(); // will need to sub 'Y' for last SF column if # of fields updates?
+    swWorkers.getRange('A2:Z').clearContent(); // will need to sub 'Z' for last SF column if # of fields updates?
     } catch(err) {
       logErrorFunctions('setCASimple: DELETE', '', '', err);
     }
@@ -113,4 +119,15 @@ async function setCAsSimple(payload) {
     logErrorFunctions('setCASimple: ADD', payload[0], '', err);
   }
 
+}
+const swAssessments = swss.getSheetByName('Assessments'); 
+function syncCardsAndAssessments() {
+  // find rows that need updating
+  const workerValues = swWorkers.getDataRange().getValues();
+  const assessmentValues = swAssessments.getDataRange().getValues();
+  const updateWorkerIds = workerValues.map((row) => {
+    if (row[3] === employerName) {
+      return index + 1;
+    }
+  }).filter(n => n);
 }

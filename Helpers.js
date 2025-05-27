@@ -246,6 +246,7 @@ function isEmptyRow(row){
 }
 
 function removeEmptyRows(sheet){
+  console.log('removeEmptyRows');
   var range = sheet.getDataRange();
   var data = range.getValues();
 
@@ -253,7 +254,12 @@ function removeEmptyRows(sheet){
     var row = data[rowIndex];
 
     if (isEmptyRow(row)){
-      sheet.deleteRow(rowIndex + 1);
+      try {
+        sheet.deleteRow(rowIndex + 1);
+      } catch(err) {
+        logErrorFunctions('removeEmptyRows', rowIndex + 1, row, err);
+      }
+      
     }
   }
 

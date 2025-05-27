@@ -19,7 +19,8 @@ async function createNewCampaignAssessment(
   Student_Major__c,
   Relationships__c,
   Potential_Leader__c,
-  AppSheet_ID__c) {
+  AppSheet_ID__c,
+  AppSheet_Department__c) {
   // First_name_from_form__c = 'testFirst', 
   // Preferred_Name_from_Form__c = 'testNickname',
   // Last_Name_from_form__c = 'testLast',
@@ -37,10 +38,11 @@ async function createNewCampaignAssessment(
   // ZIP__c = '12345',
   // Department_Lookup__c = 'a1WRt0000028WG5MAM',
   // Student_Clubs__c = ['American Sign Language (ASL)','Anime Club'],
-  // Student_Major__c = 'Arts & Letters',
+  // Student_Major__c = ['Arts & Letters'],
   // Relationships__c = 'relationship notes',
   // Potential_Leader__c = true,
-  // AppSheet_ID__c = '12345678' ) {
+  // AppSheet_ID__c = '12345678',
+  // AppSheet_Department__c = 'a1WRt0000028WG5MAM' ) {
 
   const body = {
     First_name_from_form__c, 
@@ -61,12 +63,14 @@ async function createNewCampaignAssessment(
     Department_Lookup__c,
     Student_Clubs__c: arrayToSFMultiSelectPicklist(Student_Clubs__c),
     Student_Major__c: arrayToSFMultiSelectPicklist(Student_Major__c),
+    Relationships__c,
     Potential_Leader__c,
     In_Unit__c: true,
     RecordTypeId: '012Rf000002kYiIIAU', // External Campaigns
     Campaign_Name_Picklist__c: 'Student Workers',
     Employer_Lookup__c: '001Rt00000tUA2lIAG', // SWO - Unknown
-    AppSheet_ID__c
+    AppSheet_ID__c,
+    AppSheet_Department__c
   };
 
 
@@ -86,11 +90,24 @@ async function createNewCampaignAssessment(
 
       console.log(`createNewCampaignAssessment: 84 *******************`);
       console.log(response);
+      const jsonResponse = JSON.parse(response);
+      const id = jsonResponse.id;
+
+      // write CA_ID value back to google sheet
+      const appSheetIds = swWorkers.getRange("Y2:Y").getValues().flat();
+      // find matching appSheetId
+      // console.log(`AppSheet_ID__c: ${AppSheet_ID__c}`);
+      const rowIndex = appSheetIds.indexOf(AppSheet_ID__c);
+      if (rowIndex > 1) {
+        const cell = swWorkers.getRange(`A${rowIndex + 2}`); // add 2 to row index bc there was no Appsheet ID in header row
+        cell.setValue(id);
+      }
+      
 
       return {
-        success: response.success,
+        success: true,
         errors: null,
-        id: response.id
+        id
       }  
 
     } catch (err) {
