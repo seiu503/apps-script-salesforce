@@ -7,7 +7,7 @@ const CAfieldsArray = [
   'Email_from_form__c', 
   'AGENCY_from_form__c', 
   'Department__c',
-  'Job_Title__c', // picklist? check if we need a different field for this?
+  'Job_Title__c', 
   'Willing_to_Help__c', 
   'Preferred_Language_from_form__c', 
   'Phone_from_form__c', 
@@ -25,7 +25,8 @@ const CAfieldsArray = [
   'In_Unit__c',
   'AppSheet_ID__c',
   'AppSheet_Department__c',
-  'Auth_Card_Date_Time__c'
+  'Auth_Card_Date_Time__c',
+  'CreatedBy_AppSheetUser__c'
   ];
 const swss = SpreadsheetApp.openByUrl(
     'https://docs.google.com/spreadsheets/d/14a5ZRXFbAl69VQ98aJ1lCnWLcfh3mhZrKpsxAT01btA/edit',
@@ -105,7 +106,7 @@ async function setCAsSimple(payload) {
   // clear all existing rows except header row, if there is more than one row in the sheet
   if (swWorkers.getMaxRows() > 1) {
     try {
-    swWorkers.getRange('A2:AA').clearContent(); // will need to sub 'AA' for last SF column if # of fields updates?
+    swWorkers.getRange('A2:AB').clearContent(); // sub 'AB' for last SF column if # of fields updates
     } catch(err) {
       logErrorFunctions('setCASimple: DELETE', '', '', err);
     }
@@ -121,55 +122,3 @@ async function setCAsSimple(payload) {
   }
 
 }
-const swAssessments = swss.getSheetByName('Assessments'); 
-// function syncCardsAndAssessments() {
-//   // find rows that need updating
-//   const workerValues = swWorkers.getDataRange().getValues().slice(1); // remove header row
-//   const assessmentValues = swAssessments.getDataRange().getValues().slice(1); // remove header row
-//   let cardSignDateTime;
-//   const updateWorkerIds = workerValues.map((row, idx) => {
-//     if (row[12] == true || 'true') {
-//       const nameCombo1 = workerValues[idx][2] ? `${workerValues[idx][2]} ${workerValues[idx][3]}` : `${workerValues[idx][1]} ${workerValues[idx][3]}`;
-
-//       // check if most recent assessment was set before card sign date and is not a 2
-//       cardSignDateTime = row[26] ? new Date(row[26]) : new Date(row[13]);
-//       console.log(`${nameCombo1} cardSignDateTime: ${cardSignDateTime}, card signed = ${row[12]}`);
-//       const matchingAssessments = assessmentValues.filter(aRow => aRow[6] === row[24]).filter(n => n);
-//       if (!matchingAssessments.length) {
-//         console.log(`no matching assessments for ${nameCombo1} at index ${idx}`);
-//         return [idx, nameCombo1, row[12], cardSignDateTime];
-//       } else {
-//         const mostRecentMatchingAssessmemt = matchingAssessments.sort((a,b) => new Date(b[1]) - new Date(a[1]))[0];
-//         // const mRMADate = new Date(mostRecentMatchingAssessmemt[1].toDateString()); // this strips out the timestamp
-//         const mRMADate = new Date(mostRecentMatchingAssessmemt[1]);
-//         console.log(`${nameCombo1} mRMADate: ${mRMADate}`);
-//         console.log(`is most recent assessment (mRMA date) smaller than card sign date for ${nameCombo1}? ${mRMADate < cardSignDateTime}`);
-//         console.log(mostRecentMatchingAssessmemt[3]);
-//         if (mRMADate < cardSignDateTime && mostRecentMatchingAssessmemt[3] != '2') {
-//           return [idx, nameCombo1, row[12], cardSignDateTime];
-//         }      
-//     }}
-//   }).filter(n => n);
-//   console.log('updateWorkerIds: this should be only card signers');
-//   console.log(updateWorkerIds.find(item => item[2] !== 'true'));
-//   for (i = 1; i < updateWorkerIds.length; i++) {
-//     const id = generateUID(8);
-//     const idxx = updateWorkerIds[i[0]] - 1;
-//     if (workerValues[idxx] && workerValues[idxx].length) {
-//       const nameCombo = workerValues[idxx][2] ? `${workerValues[idxx][2]} ${workerValues[idxx][3]}` : `${workerValues[idxx][1]} ${workerValues[idxx][3]}`;
-//       cardSignDateTime = workerValues[idxx][26] ? new Date(workerValues[idxx][26]) : new Date(workerValues[idxx][13]);
-//       const row = [				
-//         id, // AssessID
-//         cardSignDateTime, // Date
-//         'Signed Card', // AssessedBy	
-//         '2', // Assessment	
-//         workerValues[idxx][0], // CA ID	
-//         nameCombo, // Name
-//         workerValues[idxx][24] // AppSheet Worker ID
-//       ];
-//       console.log(`i: ${i} . ${idxx + 1}: ${nameCombo}`);
-//       // console.log(row);
-//       // swAssessments.appendRow(row);
-//     }
-//   };
-// }

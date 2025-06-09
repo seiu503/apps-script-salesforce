@@ -20,7 +20,8 @@ async function createNewCampaignAssessment(
   Relationships__c,
   Potential_Leader__c,
   AppSheet_ID__c,
-  AppSheet_Department__c) {
+  AppSheet_Department__c,
+  CreatedBy_AppSheetUser__c) {
   // First_name_from_form__c = 'testFirst', 
   // Preferred_Name_from_Form__c = 'testNickname',
   // Last_Name_from_form__c = 'testLast',
@@ -42,7 +43,8 @@ async function createNewCampaignAssessment(
   // Relationships__c = 'relationship notes',
   // Potential_Leader__c = true,
   // AppSheet_ID__c = '12345678',
-  // AppSheet_Department__c = 'a1WRt0000028WG5MAM' ) {
+  // AppSheet_Department__c = 'a1WRt0000028WG5MAM',
+  // CreatedBy_AppSheetUser__c = '005Rt00000H9KCFIA3' ) {
 
   const body = {
     First_name_from_form__c, 
@@ -70,7 +72,8 @@ async function createNewCampaignAssessment(
     Campaign_Name_Picklist__c: 'Student Workers',
     Employer_Lookup__c: '001Rt00000tUA2lIAG', // SWO - Unknown
     AppSheet_ID__c,
-    AppSheet_Department__c
+    AppSheet_Department__c,
+    CreatedBy_AppSheetUser__c
   };
 
 

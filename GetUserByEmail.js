@@ -1,6 +1,6 @@
 const userIds = users.getRange("A2:A").getValues().flat().filter(Boolean);
 
-async function getUserByEmail(email = 'rifkegribenes@gmail.com') {
+async function getUserByEmail(email = 'rooneyn@seiu503.org') {
   console.log(`getUserByEmail.gs > 2, email: ${email}`);
   if (email) {
     const qp = new QueryParameters();
