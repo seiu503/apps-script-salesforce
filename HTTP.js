@@ -58,6 +58,7 @@ const fetch_ = ({
   apiVersion = 50,
   env = '',
 }) => {
+  let response;
   try {
     const endpoint = createEndpoint_({
       batch,
@@ -77,7 +78,7 @@ const fetch_ = ({
     const accessToken = accessTokenResponse.access_token;
     const instanceUrl = accessTokenResponse.instance_url;
     const options = getOptions_({ accessToken, method, payload });
-    let response = UrlFetchApp.fetch(instanceUrl + endpoint, options);
+    response = UrlFetchApp.fetch(instanceUrl + endpoint, options);
     let json;
     // console.log(`HTTP: 82: response ========&&&&&&&&&&&&&&&&&&&&&============`);
     // console.log(response);
@@ -108,6 +109,7 @@ const fetch_ = ({
       const respObject = response.getContentText();
       if (respObject.errors && respObject.errors.length || respObject.errorCode) {
           console.log("--- error1 --- HTTP.gs > 109");
+          Logger.log(`Error (${ response ? response.getResponseCode() : ""}): ${response ? response.getContentText() : ''}`);
           logErrorFunctions('fetch_', '', '', JSON.stringify(respObject));
         } else {
           console.log('HTTP.gs > 113');
@@ -118,6 +120,10 @@ const fetch_ = ({
   } catch (error) {
     console.log("--- error2 --- HTTP.gs > 120");
     console.log(error);
+    if (response) {
+      Logger.log(`Error (${response.getResponseCode()}): ${response.getContentText()}`);
+    }
+    
     logErrorFunctions('fetch_', '', '', error);
   }
 };
