@@ -80,9 +80,11 @@ const fetch_ = ({
     const options = getOptions_({ accessToken, method, payload });
     response = UrlFetchApp.fetch(instanceUrl + endpoint, options);
     let json;
-    // console.log(`HTTP: 82: response ========&&&&&&&&&&&&&&&&&&&&&============`);
-    // console.log(response);
-    // console.log(response.getContentText());
+    if (response.getResponseCode() !== 200) {
+      console.log(`HTTP: 84: response ========&&&&&&&&&&&&&&&&&&&&&============`);
+      console.log(response.getContentText());
+    }
+    
     if (method === METHODS.GET) {
       json = JSON.parse(response.toString());
       // console.log(`HTTP.gs > 80`);
@@ -175,7 +177,7 @@ const getOptions_ = ({
     method: method,
     contentType: contentType,
     headers: headers,
-    muteHttpExceptions: false,
+    muteHttpExceptions: true,
   };
 
   // console.log('http.gs > 179: payload:');

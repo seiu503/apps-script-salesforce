@@ -24,10 +24,12 @@ async function getPardotListEmails() {
     qp.setWhere(`ScheduledDate = LAST_N_DAYS:7 AND TotalSent > 1`); 
 
     const records = await get(qp, '50', 'prod');
-    console.log(records[1]);
+
+    if (records) {
+      console.log(records[1]);
 
   // Format output
-  const output = records.map(record => {
+  const output = records.filter(r => !(r.Name.startsWith('Send Email') || !r.CampaignId) ).map(record => {
     return [
       record.Name,
       record.CampaignId || '',
@@ -47,7 +49,7 @@ async function getPardotListEmails() {
 
   // Write to Sheet
   const pmetricsSheet = SpreadsheetApp.openByUrl(
-    'https://docs.google.com/spreadsheets/d/1ILjn1pwFjx0CDBx0HZ6RfF9AgJ4OzEE-0wjJMtsHhFA/edit?gid=0#gid=0',
+    'https://docs.google.com/spreadsheets/d/1NnkJWfuLOvACvMuxyJbKgF-Pz0NHgy6dp-QmTSI5lRg/edit?gid=0#gid=0', // owned by seiu503@gmail.com
   );
   const pardot_metrics = pmetricsSheet.getSheetByName('pardot_metrics'); 
   pardot_metrics.clearContents();
@@ -67,5 +69,10 @@ async function getPardotListEmails() {
     'Unique Opt Outs'
   ]);
   pardot_metrics.getRange(2, 1, output.length, output[0].length).setValues(output);
+
+    } else {
+      logErrorFunctions('getPardotListEmails', null, null, 'No records returned');
+    }
+    
 }
 

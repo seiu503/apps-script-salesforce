@@ -28,17 +28,25 @@ const CAfieldsArray = [
   'Auth_Card_Date_Time__c',
   'CreatedBy_AppSheetUser__c'
   ];
-const swss = SpreadsheetApp.openByUrl(
+let swss = SpreadsheetApp.openByUrl(
     'https://docs.google.com/spreadsheets/d/14a5ZRXFbAl69VQ98aJ1lCnWLcfh3mhZrKpsxAT01btA/edit',
 );
-const swWorkers = swss.getSheetByName('StudentWorkers'); 
-const swUsers = swss.getSheetByName('Users');
-const CAIds = swWorkers.getRange("A2:A").getValues().flat().filter(Boolean);
+let swWorkers = swss.getSheetByName('StudentWorkers'); 
+let swUsers = swss.getSheetByName('Users');
+let CAIds = swWorkers.getRange("A2:A").getValues().flat().filter(Boolean);
 // console.log('CAIds');
 // console.log(CAIds);
 
-async function getCAsByCampaign() {
-  console.log(`getCAsByCampaign.gs > 29`);
+async function getCAsByCampaign(env) {
+  console.log(`getCAsByCampaign.gs > 29: env: ${env}`);
+
+  if (env === 'prod') {
+    swss = SpreadsheetApp.openByUrl(SW_PROD_SHEET_URL);
+    swWorkers = swss.getSheetByName('StudentWorkers'); 
+    swUsers = swss.getSheetByName('Users');
+    CAIds = swWorkers.getRange("A2:A").getValues().flat().filter(Boolean);
+  }
+
   let records;
     try {
       const qp = new QueryParameters();
@@ -47,14 +55,14 @@ async function getCAsByCampaign() {
       qp.setWhere(`Campaign_Name_Picklist__c = 'Student Workers'`);
 
       // add 'prod' as 3d argument to get() to get from production; otherwise gets records from 503admin sandbox
-      records = await get(qp, '50');
+      records = await get(qp, '50', env);
       if (records && records.length) {
         console.log(`${records.length} records returned`);
       } else {
         console.log(`no records returned`);
       }
 
-      setCAsSimple(records);
+      setCAsSimple(records, swWorkers);
       try {
         removeEmptyRows(swWorkers);
       } catch(err) {
@@ -98,15 +106,15 @@ function appendNewRowsSimple(data, sheet) {
     }
 }
 
-async function setCAsSimple(payload) {
+async function setCAsSimple(payload, sheet) {
   console.log(`setCAsSimple`);
   console.log(payload[0]);
   
   console.log('clear'); 
   // clear all existing rows except header row, if there is more than one row in the sheet
-  if (swWorkers.getMaxRows() > 1) {
+  if (sheet.getMaxRows() > 1) {
     try {
-    swWorkers.getRange('A2:AB').clearContent(); // sub 'AB' for last SF column if # of fields updates
+    sheet.getRange('A2:AB').clearContent(); // sub 'AB' for last SF column if # of fields updates
     } catch(err) {
       logErrorFunctions('setCASimple: DELETE', '', '', err);
     }
@@ -115,7 +123,7 @@ async function setCAsSimple(payload) {
   console.log('add'); 
   // add all rows from payload
   try {
-    appendNewRowsSimple(payload, swWorkers);
+    appendNewRowsSimple(payload, sheet);
     return;
   } catch (err) {
     logErrorFunctions('setCASimple: ADD', payload[0], '', err);
