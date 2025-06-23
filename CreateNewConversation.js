@@ -14,8 +14,9 @@ async function createNewConversation(
   Notes__c,
   Conversation_Result__c,
   Issues__c,
-  Follow_up__c) {
-  console.log(`createNewConversation.gs > 2, createNewConversation`);
+  Follow_up__c, 
+  env) {
+  console.log(`createNewConversation.gs > 2, env: ${env}`);
 
   let today = formatSFDate(new Date());
   // const Signed_Card__c = CVRSOS__Result__c.includes('SIGNED');
@@ -41,12 +42,13 @@ async function createNewConversation(
     try {
       await insert({ 
         sObject: 'External_Conversation__c', 
-        payload: { ...body }
+        payload: { ...body },
+        env
         })
 
       // if conversation is created successfully, pull in updated CA with refreshed data from SF
       try {
-        await getCAById(Campaign_Assessment__c);
+        await getCAById(Campaign_Assessment__c, env);
       } catch {
         logErrorFunctions('createNewConversation', {body}, '', err);
         return {

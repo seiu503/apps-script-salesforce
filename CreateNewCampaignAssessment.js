@@ -21,14 +21,15 @@ async function createNewCampaignAssessment(
   Potential_Leader__c,
   AppSheet_ID__c,
   AppSheet_Department__c,
-  CreatedBy_AppSheetUser__c) {
+  CreatedBy_AppSheetUser__c,
+  env) {
   // First_name_from_form__c = 'testFirst', 
   // Preferred_Name_from_Form__c = 'testNickname',
   // Last_Name_from_form__c = 'testLast',
   // Pronouns__c = 'She/Her',
   // Email_from_form__c = 'test@test.com', 
   // AGENCY_from_form__c = 'Portland State University', 
-  // Department__c = 'TLC The Learning Center Svcs',
+  // Department__c = 'ACB AAS Academic Advising Serv',
   // Job_Title__c =  'Test job title', 
   // Willing_to_Help__c = true, 
   // Preferred_Language_from_form__c = 'English', 
@@ -37,15 +38,22 @@ async function createNewCampaignAssessment(
   // City__c = "Portland",
   // State__c = 'OR',
   // ZIP__c = '12345',
-  // Department_Lookup__c = 'a1WRt0000028WG5MAM',
+  // Department_Lookup__c = 'a1WRf0000027vmn',
   // Student_Clubs__c = ['American Sign Language (ASL)','Anime Club'],
   // Student_Major__c = ['Arts & Letters'],
   // Relationships__c = 'relationship notes',
   // Potential_Leader__c = true,
   // AppSheet_ID__c = '12345678',
-  // AppSheet_Department__c = 'a1WRt0000028WG5MAM',
-  // CreatedBy_AppSheetUser__c = '005Rt00000H9KCFIA3' ) {
+  // AppSheet_Department__c = 'a1WRf0000027vmn',
+  // CreatedBy_AppSheetUser__c = '0054N000003rixvQAA',
+  // env = 'prod' ) {
 
+  let eLookup;
+  if (env = 'prod') {
+    eLookup = '001Rf00000RQ5m8IAD' // Student Workers, production
+  } else {
+    eLookup = '001Rt00000tUA2lIAG' // SWO - Unknown, sandbox
+  }
   const body = {
     First_name_from_form__c, 
     Preferred_Name_from_Form__c,
@@ -68,27 +76,35 @@ async function createNewCampaignAssessment(
     Relationships__c,
     Potential_Leader__c,
     In_Unit__c: true,
-    RecordTypeId: '012Rf000002kYiIIAU', // External Campaigns
+    RecordTypeId: '012Rf000002kYiIIAU', // External Campaigns, same in sandbox and prod
     Campaign_Name_Picklist__c: 'Student Workers',
-    Employer_Lookup__c: '001Rt00000tUA2lIAG', // SWO - Unknown
+    Employer_Lookup__c: eLookup, 
     AppSheet_ID__c,
     AppSheet_Department__c,
     CreatedBy_AppSheetUser__c
   };
 
 
-  console.log(`createNewCampaignAssessment.gs > 74}`);
+  console.log(`createNewCampaignAssessment.gs > 74, env: ${env}}`);
   console.log(body);
   
   const cleanBody = removeNullValues(body);
   console.log('cleanBody');
   console.log(cleanBody);
 
+  if (env === 'prod') {
+    swss = SpreadsheetApp.openByUrl(SW_PROD_SHEET_URL);
+    swWorkers = swss.getSheetByName('StudentWorkers'); 
+    swUsers = swss.getSheetByName('Users');
+    CAIds = swWorkers.getRange("A2:A").getValues().flat().filter(Boolean);
+  }
+
   if (cleanBody) {
     try {
       const response = await insert({ 
         sObject: 'Higher_Ed_Strike_Pledge__c', 
-        payload: { ...cleanBody }
+        payload: { ...cleanBody },
+        env
         });
 
       console.log(`createNewCampaignAssessment: 84 *******************`);
