@@ -22,8 +22,9 @@ async function updateCampaignAssessment(
   Potential_Leader__c,
   In_Unit__c,
   AppSheet_ID__c,
-  AppSheet_Department__c) {
-  // Id = 'a2RRt000000qHZRMA2',
+  AppSheet_Department__c,
+  env) {
+  // Id = 'a2RRf000000UcJBMA0', // this is a prod id, switch to sandbox if testing there
   // First_name_from_form__c = 'updatedFirst', 
   // Preferred_Name_from_Form__c = 'updatedNickname',
   // Pronouns__c = 'He/Him',
@@ -39,14 +40,15 @@ async function updateCampaignAssessment(
   // City__c = "Portland",
   // State__c = 'OR',
   // ZIP__c = '12345',
-  // Department_Lookup__c = 'a1WRt0000028WG5MAM',
+  // Department_Lookup__c = 'a1WRf0000027uXN', // prod ID
   // Student_Clubs__c = ['American Sign Language (ASL)','Anime Club'],
-  // Student_Major__c = 'Arts & Letters',
+  // Student_Major__c = ['Arts & Letters'],
   // Relationships__c = 'relationship notes',
   // Potential_Leader__c = false,
   // In_Unit__c = false,
   // AppSheet_ID__c = '12345678',
-  // AppSheet_Department__c = 'a1WRt0000028WG5MAM') {
+  // AppSheet_Department__c = 'a1WRf0000027uXN', // prod ID
+  // env = 'prod') {
 
   const body = {
     First_name_from_form__c, 
@@ -89,7 +91,7 @@ async function updateCampaignAssessment(
         sObjectId: Id,
         payload: { ...cleanBody },
         apiVersion: '50', 
-        env: 'staging'
+        env
         });
 
       return {
