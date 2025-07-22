@@ -83,6 +83,12 @@ const fetch_ = ({
     if (response.getResponseCode() !== 200) {
       console.log(`HTTP: 84: response ========&&&&&&&&&&&&&&&&&&&&&============`);
       console.log(response.getContentText());
+      const respObject = response.getContentText();
+      if (respObject.errors && respObject.errors.length || respObject.errorCode) {
+          console.log("--- error0 --- HTTP.gs > 88");
+          Logger.log(`Error (${ response ? response.getResponseCode() : ""}): ${response ? response.getContentText() : ''}`);
+          logErrorFunctions('fetch_', '', '', JSON.stringify(respObject));
+        } 
     }
     
     if (method === METHODS.GET) {
