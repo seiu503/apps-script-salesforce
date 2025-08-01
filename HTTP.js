@@ -145,7 +145,7 @@ const createEndpoint_ = ({
   apiVersion,
 }) => {
   let endpoint = URL_BEGINNING + apiVersion + ".0/";
-  // console.log(`http.gs > 138: endpoint: ${endpoint}`);
+  // console.log(`http.gs > 148: endpoint: ${endpoint}`);
 
   switch (method) {
     case METHODS.GET:
@@ -166,7 +166,7 @@ const createEndpoint_ = ({
     default:
       endpoint += "";
   }
-  // console.log(`http.gs > 159: endpoint: ${endpoint}`);
+  // console.log(`http.gs > 169: endpoint: ${endpoint}`);
   return endpoint;
 };
 
