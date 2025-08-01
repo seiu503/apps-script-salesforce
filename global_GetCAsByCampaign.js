@@ -1,7 +1,10 @@
 async function global_getCAsByCampaign(env = 'prod', campaign = 'jacksonCounty') {
   console.log(`global_getCAsByCampaign.gs > 33: env: ${env}`);
+  // set config
   const config = globalConfig(campaign);
-  console.log(config.fieldList.toString());
+  const ss = SpreadsheetApp.openByUrl(config.sheetURL);
+  console.log(`config ss: ${ss.getName()}`);
+  const workers = ss.getSheetByName(config.workerSheetName); 
 
   let records;
     try {

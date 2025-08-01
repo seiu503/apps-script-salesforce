@@ -17,26 +17,3 @@ async function getCAById(id, env) {
   }
   
 }
-
-async function setCAById(id, payload, sheet) {
-  console.log('setCAById');
-  console.log(id);
-  const allData = sheet.getDataRange().getValues();
-  const matchingCAId = (row) => row[0] === id;
-  const updateIndex = allData.findIndex(matchingCAId);
-  // console.log(`updateIndex: ${updateIndex}`);
-  if (!updateIndex || updateIndex < 0) {
-    // just add the new contact
-    await appendNewRow(payload, sheet); 
-  } else {
-    try {
-      // replace contact in matching row
-      sheet.deleteRow(updateIndex + 1);
-      // append new row with data from paylod from getCAById function
-      appendNewRow(payload, sheet); 
-    } catch (err) {
-      console.log(err);
-      logErrorFunctions('setCAById', payload, updateIndex, err);
-    }
-  }
-}
