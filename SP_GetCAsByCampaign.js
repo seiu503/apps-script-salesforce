@@ -15,7 +15,13 @@ const SP_CAfieldsArray = [
   'ZIP__c',
   'Potential_Leader__c',
   'In_Unit__c',
-  'AppSheet_ID__c'
+  'AppSheet_ID__c',
+  'Signed_Membership_Form__c',	
+  'Member_Form_Signed_Date_Time__c',
+  'Bargaining_Survey_Complete__c',
+  'Bargaining_Survey_Completed_DATE__c',
+  'Sticker_Up_Participation__c',
+  'Bargaining_Team__c'
   ];
 let spss = SpreadsheetApp.openByUrl(
     'https://docs.google.com/spreadsheets/d/1JktJuDesKyZMW6gcM2wRNzIs-BAfobNcC6DuvYg_itM/edit', // Sapphire contract campaign
@@ -74,7 +80,7 @@ async function SP_setCAsSimple(payload, sheet) {
   // clear all existing rows except header row, if there is more than one row in the sheet
   if (sheet.getMaxRows() > 1) {
     try {
-    sheet.getRange('A2:AB').clearContent(); // sub 'AB' for last SF column if # of fields updates
+    sheet.getRange('A2:W').clearContent(); // sub 'W' for last SF column if # of fields updates
     } catch(err) {
       logErrorFunctions('SP_setCAsSimple: DELETE', '', '', err);
     }

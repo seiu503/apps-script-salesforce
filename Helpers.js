@@ -226,7 +226,7 @@ function isEmpty(obj) {
 
 function removeNullValues(obj) {
   for (const key in obj) {
-    if (obj[key] === null) {
+    if (obj[key] === null || obj[key] === '') {
       delete obj[key];
     } else if (typeof obj[key] === 'object') {
       removeNullValues(obj[key]); // Recursively handle nested objects

@@ -1,10 +1,10 @@
 const fieldsArray = ['Id', 'Salutation_Last__c', 'Email', 'Employer_Name_Text__c', 'Title', 'Preferred_Language__c', 'Best_Phone__c', 'Binary_Membership__c', 'Salutation_Name__c', 'Pre_Fill_Member_Form_Link__c', 	'Current_Member_Status__c'];
-const ss = SpreadsheetApp.openByUrl(
+const mlss = SpreadsheetApp.openByUrl(
     'https://docs.google.com/spreadsheets/d/11pYOEoAtTtxH_5y6uxzVuhUis6DvZxFJoazHnuMD4R4/edit',
 );
-const workers = ss.getSheetByName('MemberChartingApp'); 
-const users = ss.getSheetByName('Users');
-const contactIds = workers.getRange("A2:A").getValues().flat().filter(Boolean);
+const mlworkers = mlss.getSheetByName('MemberChartingApp'); 
+const mlusers = mlss.getSheetByName('Users');
+const contactIds = mlworkers.getRange("A2:A").getValues().flat().filter(Boolean);
 // console.log('contactIds');
 // console.log(contactIds);
 
@@ -69,7 +69,7 @@ function appendNewRows(data, sheet) {
 
 async function setUserTurf(employerName, payload) {
   console.log(`setUserTurf: ${employerName}`);
-  const allData = workers.getDataRange().getValues();
+  const allData = mlworkers.getDataRange().getValues();
   const payloadContactIds = payload.map(obj => obj.Id).filter(Boolean);
   const turfIndices = allData.map((row, index) => {
     if (row[3] === employerName) {
@@ -85,7 +85,7 @@ async function setUserTurf(employerName, payload) {
   if (!turfIndices.length) {
     console.log('just add new rows')
     try {
-      appendNewRows(payload, workers);
+      appendNewRows(payload, mlworkers);
       return {Success: true, Error: null}
     } catch (err) {
       logErrorFunctions('setUserTurf: ALL NEW', turfIndices, '', err);
@@ -115,9 +115,9 @@ async function setUserTurf(employerName, payload) {
         console.log(rowsToDelete);
         if (rowsToDelete && rowsToDelete.length) {
           const indicesOfRowsToDelete = rowsToDelete.map(row => row[0]);
-          const sheetId = workers.getSheetId();
+          const sheetId = mlworkers.getSheetId();
           const requests = indicesOfRowsToDelete.reverse().map(e => ({ deleteDimension: { range: { sheetId, startIndex: e - 1, endIndex: e, dimension: "ROWS" } } }));
-          Sheets.Spreadsheets.batchUpdate({ requests }, ss.getId());
+          Sheets.Spreadsheets.batchUpdate({ requests }, mlss.getId());
           SpreadsheetApp.flush();
         } 
       }
@@ -134,7 +134,7 @@ async function setUserTurf(employerName, payload) {
     console.log(rowsToAdd);
     if (rowsToAdd && rowsToAdd.length) {
       try {
-        appendNewRows(rowsToAdd, workers);
+        appendNewRows(rowsToAdd, mlworkers);
       } catch (err) {
         logErrorFunctions('setUserTurf: ADD', payloadContactIds, rowsToAdd, err);
       }
@@ -198,11 +198,11 @@ async function setUserTurf(employerName, payload) {
     console.log(indicesOfRowsToUpdate);
     if (newRowsToAppend && newRowsToAppend.length && indicesOfRowsToUpdate && indicesOfRowsToUpdate.length) {
       try {
-      const sheetId = workers.getSheetId();
+      const sheetId = mlworkers.getSheetId();
       const requests = indicesOfRowsToUpdate.reverse().map(e => ({ deleteDimension: { range: { sheetId, startIndex: e - 1, endIndex: e, dimension: "ROWS" } } }));
-      Sheets.Spreadsheets.batchUpdate({ requests }, ss.getId());
+      Sheets.Spreadsheets.batchUpdate({ requests }, mlss.getId());
       SpreadsheetApp.flush();
-      appendNewRows(newRowsToAppend, workers);
+      appendNewRows(newRowsToAppend, mlworkers);
     } catch (err) {
       logErrorFunctions('setUserTurf: UPDATE', indicesOfRowsToUpdate, newRowsToAppend, err);
     } 
@@ -210,10 +210,10 @@ async function setUserTurf(employerName, payload) {
 
     // remove duplicates
     console.log('removing dupes');
-    const sheetId = workers.getSheetId();
+    const sheetId = mlworkers.getSheetId();
     console.log(`sheetId: ${sheetId}`);
     const resource = { requests: [{ deleteDuplicates: { range: { sheetId } } }] };
-    Sheets.Spreadsheets.batchUpdate(resource, ss.getId());
+    Sheets.Spreadsheets.batchUpdate(resource, mlss.getId());
     SpreadsheetApp.flush();
   }
 }

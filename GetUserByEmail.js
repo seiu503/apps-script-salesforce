@@ -1,8 +1,7 @@
 const userIds = users.getRange("A2:A").getValues().flat().filter(Boolean);
 
-async function getUserByEmail(email, env) {
+async function getUserByEmail(email='lucusa@seiu503.org', env = 'prod') {
   const url = env === 'prod' ? SW_PROD_SHEET_URL : SW_DEV_SHEET_URL;
-  const userSheet = SpreadsheetApp.openByUrl(url).getSheetByName('Users');
   console.log(`getUserByEmail.gs > 2, email: ${email}, env: ${env}`);
   if (email) {
     const qp = new QueryParameters();
@@ -14,7 +13,7 @@ async function getUserByEmail(email, env) {
       const records = get(qp, '50', env);
       console.log('getUser payload:');
       console.log(records);
-      await setUser(records, userSheet);
+      await setUser(records, users);
       return{
         Turf: records[0].AppSheetTurf__c,
         Success: true,
