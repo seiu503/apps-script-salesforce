@@ -172,3 +172,39 @@ const users = ss.getSheetByName('Users');
 let globalCAIds = workers.getRange("A2:A").getValues().flat().filter(Boolean);
 // console.log('globalCAIds');
 // console.log(globalCAIds);
+
+async function appendNewRow(obj, sheet) { // expects a single object
+    try {
+      console.log('appendNewRow > 23');
+      console.log(obj[0]);
+      console.log(Object.values(obj[0]));
+      const row = Object.values(obj[0]).slice(1);
+      sheet.appendRow(row)
+    } catch (err) {
+      console.log(err);
+      logErrorFunctions('appendNewRow', [obj, sheet], '', err);
+    }
+}
+
+
+function appendNewRowsSimple(data, sheet) {
+  const values = data.reduce((ar, obj) => {
+      ar.push(Object.values(obj).slice(1));
+      return ar;
+    }, []);
+
+  if (values && values.length) {
+
+   const last = sheet.getLastRow();
+   console.log(`last: ${last}`);
+   console.log(`sheet.getMaxRows(): ${sheet.getMaxRows()}`);
+   if (last === sheet.getMaxRows()) {
+    console.log('last === sheet.getMaxRows');
+    console.log('inserting row after last');
+    sheet.insertRowAfter(last);
+   }
+   sheet.getRange(sheet.getLastRow() + 1, 1, values.length, values[0].length).setValues(values);
+    } else {
+      logErrorFunctions('appendNewRowsSimple', [data[0], sheet], '', 'No data passed to appendNewRowsSimple');
+    }
+}

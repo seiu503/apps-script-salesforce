@@ -84,27 +84,7 @@ async function getCAsByCampaign(env) {
   
 }
 
-function appendNewRowsSimple(data, sheet) {
-  const values = data.reduce((ar, obj) => {
-      ar.push(Object.values(obj).slice(1));
-      return ar;
-    }, []);
 
-  if (values && values.length) {
-
-   const last = sheet.getLastRow();
-   console.log(`last: ${last}`);
-   console.log(`sheet.getMaxRows(): ${sheet.getMaxRows()}`);
-   if (last === sheet.getMaxRows()) {
-    console.log('last === sheet.getMaxRows');
-    console.log('inserting row after last');
-    sheet.insertRowAfter(last);
-   }
-   sheet.getRange(sheet.getLastRow() + 1, 1, values.length, values[0].length).setValues(values);
-    } else {
-      logErrorFunctions('appendNewRowsSimple', [data[0], sheet], '', 'No data passed to appendNewRowsSimple');
-    }
-}
 
 async function setCAsSimple(payload, sheet) {
   console.log(`setCAsSimple`);

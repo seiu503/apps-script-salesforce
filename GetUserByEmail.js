@@ -1,7 +1,15 @@
-const userIds = users.getRange("A2:A").getValues().flat().filter(Boolean);
 
-async function getUserByEmail(email='lucusa@seiu503.org', env = 'prod') {
-  const url = env === 'prod' ? SW_PROD_SHEET_URL : SW_DEV_SHEET_URL;
+
+async function getUserByEmail(email='lucusa@seiu503.org', env = 'prod', campaign) {
+
+  const config = globalConfig(campaign = 'jacksonCounty');
+  const ss = SpreadsheetApp.openByUrl(config.sheetURL);
+  console.log(`config ss: ${ss.getName()}`);
+  const workers = ss.getSheetByName(config.workerSheetName); 
+  const users = ss.getSheetByName('Users');
+
+  const userIds = users.getRange("A2:A").getValues().flat().filter(Boolean);
+
   console.log(`getUserByEmail.gs > 2, email: ${email}, env: ${env}`);
   if (email) {
     const qp = new QueryParameters();
@@ -40,18 +48,7 @@ async function getUserByEmail(email='lucusa@seiu503.org', env = 'prod') {
   
 }
 
-async function appendNewRow(obj, sheet) { // expects a single object
-    try {
-      console.log('appendNewRow > 23');
-      console.log(obj[0]);
-      console.log(Object.values(obj[0]));
-      const row = Object.values(obj[0]).slice(1);
-      sheet.appendRow(row)
-    } catch (err) {
-      console.log(err);
-      logErrorFunctions('appendNewRow', [obj, sheet], '', err);
-    }
-}
+
 
 async function setUser(payload, sheet) {
   console.log('setUser > 33');
