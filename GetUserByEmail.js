@@ -1,8 +1,8 @@
 
 
-async function getUserByEmail(email='lucusa@seiu503.org', env = 'prod', campaign) {
+async function getUserByEmail(email, env = 'prod', campaign='jacksonCounty') {
 
-  const config = globalConfig(campaign = 'jacksonCounty');
+  const config = globalConfig(campaign);
   const ss = SpreadsheetApp.openByUrl(config.sheetURL);
   console.log(`config ss: ${ss.getName()}`);
   const workers = ss.getSheetByName(config.workerSheetName); 

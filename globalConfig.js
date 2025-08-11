@@ -75,7 +75,15 @@ const globalConfig = (campaign, turf) => {
         'In_Unit__c',
         'AppSheet_ID__c',
         'Signed_Auth_Card__c',
-        'Auth_Card_Date__c'
+        'Auth_Card_Date__c',
+        'Signed_Membership_Form__c',
+        'Member_Form_Signed_Date_Time__c',
+        'OC__c',
+        'AddressConfirmed__c',
+        'PhoneConfirmed__c',
+        'ContactInfoNotes__c',
+        'Assessment_Notes__c',
+        'LatLon__c'
       ],
       memberLeader: [
         'Id', 
@@ -135,7 +143,7 @@ const globalConfig = (campaign, turf) => {
     lastSFColumn: {
       studentWorkers: 'AB',
       sapphireCC: 'W',
-      jacksonCounty: 'U'
+      jacksonCounty: 'AA'
     },
     sheetShortVar: {
       studentWorkers: 'swss',
@@ -175,7 +183,7 @@ let globalCAIds = workers.getRange("A2:A").getValues().flat().filter(Boolean);
 
 async function appendNewRow(obj, sheet) { // expects a single object
     try {
-      console.log('appendNewRow > 23');
+      console.log('appendNewRow > 178');
       console.log(obj[0]);
       console.log(Object.values(obj[0]));
       const row = Object.values(obj[0]).slice(1);

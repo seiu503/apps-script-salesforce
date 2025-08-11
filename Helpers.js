@@ -264,3 +264,32 @@ function removeEmptyRows(sheet){
   }
 
 }
+
+/* checks if a string is a valid URL */
+async function isValidAndReachableURL(url) {
+  // Step 1: Validate URL format using the URL constructor
+  try {
+    new URL(url); // Throws an error if the URL format is invalid
+  } catch (error) {
+    console.error(`Invalid URL format: ${url}`, error);
+    return false;
+  }
+
+  // Step 2: Check URL existence and status using fetch
+  try {
+    const response = await fetch(url, { method: 'HEAD' }); // Use HEAD request for efficiency
+    if (response.status === 404) {
+      console.warn(`URL returned 404 Not Found: ${url}`);
+      return false;
+    } else if (!response.ok) {
+      // Handle other non-success status codes (e.g., 500, 403)
+      console.error(`URL returned a non-success status (${response.status}): ${url}`);
+      return false;
+    }
+    return true; // URL is valid in format and reachable (not 404)
+  } catch (error) {
+    // Handle network errors (e.g., no internet connection, DNS issues)
+    console.error(`Network or fetch error for URL: ${url}`, error);
+    return false;
+  }
+}
