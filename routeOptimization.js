@@ -1,54 +1,3 @@
-// function getOptimizedRoute(locations) {
-//   try {
-//     const payload = JSON.parse(e.postData.contents);
-//     const apiKey = GOOGLE_MAPS_API_KEY_2;
-
-//     const locations = payload.locations; // Array of lat,lng strings
-//     const origin = locations[0];
-//     const destination = locations[locations.length - 1];
-//     const waypoints = locations.slice(1, -1).join('|');
-
-//     const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&waypoints=optimize%3Atrue|${waypoints}&key=${apiKey}`;
-
-//     const response = UrlFetchApp.fetch(url);
-//     const json = JSON.parse(response.getContentText());
-
-//     const optimizedOrder = json.routes[0].waypoint_order;
-//     const orderedStops = [origin, ...optimizedOrder.map(i => locations[i + 1]), destination];
-
-//     const mapUrl = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&waypoints=optimize%3Atrue|${waypoints}`;
-
-//     console.log(mapUrl);
-
-//     // Optionally write to the sheet
-//     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Stops");
-//     sheet.getRange("E2").setValue(mapUrl); // Adjust target cell as needed
-
-//     return ContentService.createTextOutput(JSON.stringify({
-//       status: "success",
-//       orderedStops: orderedStops,
-//       mapUrl: mapUrl
-//     })).setMimeType(ContentService.MimeType.JSON);
-
-//   } catch (err) {
-//     return ContentService.createTextOutput(JSON.stringify({
-//       status: "error",
-//       message: err.toString()
-//     })).setMimeType(ContentService.MimeType.JSON);
-//   }
-// }
-
-// function onChange(e) {
-//   const ss = SpreadsheetApp.getActiveSpreadsheet();
-//   const sheet = ss.getSheetByName("Trigger"); // Or whatever table has the flag
-//   const flag = sheet.getRange("A2").getValue(); // Assuming A2 is [TriggerOptimize]
-
-//   if (flag === true) {
-//     processOptimizedRoute();
-//     sheet.getRange("A2").setValue(false); // Reset flag
-//   }
-// }
-
 const testStops = [ [ 'c86cfc5c',
     '3c62807f',
     'schneiders@seiu503.org',
@@ -165,8 +114,6 @@ async function processOptimizedRoute(campaign='jacksonCounty', user='schneiders@
   console.log(`waypoints: ${waypoints}`);
 
   const baseUrl = 'https://maps.googleapis.com/maps/api/directions/json';
-  // const params = `origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&waypoints=${encodeURIComponent(waypointsParam)}&key=${apiKey}`;
-  // const url = `${baseUrl}?${params}`;
 
   const url = baseUrl
   + '?origin=' + encodeURIComponent(origin)
@@ -186,53 +133,29 @@ async function processOptimizedRoute(campaign='jacksonCounty', user='schneiders@
   }
 
   const optimizedOrder = json.routes[0].waypoint_order;
-  console.log('optimizedOrder');
-  console.log(optimizedOrder)
+  // console.log('optimizedOrder');
+  // console.log(optimizedOrder)
 
-  // append optimized stop order to routequeue rows
+  // append optimized stop order to RouteQueue rows
   routeStops.forEach(row => {
     const originalRowIndexInRoute = routeStops.indexOf(row);
-    const rowIndexInSheet = data.slice(1).map((origRow, index) => {
-      if (origRow[1] === row[1]) { // match on stopId
-          return index;
-        }
-    })[0];
-    console.log(`rowIndexInSheet: ${rowIndexInSheet}`);
-    console.log(`originalRowIndexInRoute: ${originalRowIndexInRoute}`);
+    const matchRowOnStopId = (el) => el[1] === row[1];
+    const rowIndexInSheet = data.slice(1).findIndex(matchRowOnStopId)
     const stopOrder = optimizedOrder[originalRowIndexInRoute];
-    console.log(`stopOrder: ${stopOrder}`);
-    console.log(`setting value of routeQueue I${rowIndexInSheet + 1} to ${stopOrder}`);
-    routeQueue.getRange(`I${rowIndexInSheet + 1}`).setValue(stopOrder);
+    routeQueue.getRange(`I${rowIndexInSheet + 2}`).setValue(stopOrder);
   })
 
-
-
-  // just fetch map url and write url to sheet, and return to bot
+  // fetch map url and write url to sheet, and return to bot
     const orderedStops = [...optimizedOrder.map(i => stops[i])];
-    console.log('orderedStops');
-    console.log(orderedStops)
 
     const mapUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(userOrigin)}&destination=${encodeURIComponent(userOrigin)}&waypoints=${encodeURIComponent(orderedStops.join('|'))}`;
 
-    console.log(`mapUrl`);
-    console.log(mapUrl);
-
-  //   const urlOK = await isValidAndReachableURL(mapUrl);
-
-  // if (!urlOK) {
-  //   return {
-  //     error: 'There was an error fetching the route. Please contact the app administrator.'
-  //   }
-  // } else {
     const resultSheet = ss.getSheetByName("RouteResult");
     const today = new Date();
     const resultRow = [routeId,	mapUrl,	user,	today];
-    console.log(resultRow);
     resultSheet.appendRow(resultRow);
     return mapUrl
-
   }
-  // }
 
 
     
@@ -295,7 +218,7 @@ async function geocodeTable(campaign='jacksonCounty',latlonIndex=26,latlonRange=
   const data = workers.getDataRange().getValues(); // all data in sheet
 
   const headers = data[0];
-  const allRowsWithAddresses = data.slice(1).filter(row => !!row[10] && !!row[11] && !!row[12] && !!row[13]); // skip header
+  const allRowsWithAddresses = data.slice(1).filter(row => !!row[10] && !!row[11] && !!row[12] && !!row[13] && !row[10].includes('PO Box')); // skip header
   console.log(allRowsWithAddresses);
 
   allRowsWithAddresses.forEach( async (row) => {
