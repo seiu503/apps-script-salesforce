@@ -69,3 +69,35 @@ async function countListMembers() {
     Logger.log(`❌ API call failed: ${error}`);
   }
 }
+
+const BASE = 'https://pi.pardot.com/api/v5/objects';
+const headers = {
+  Authorization: `Bearer ${accessToken}`,
+  'Pardot-Business-Unit-Id': businessUnitId
+};
+
+function totalListEmailsCY() {
+  const start = '2025-01-01T00:00:00Z'; // this calendar year
+  const qUrl = `${BASE}/list-emails?sentAtAfterOrEqualTo=${encodeURIComponent(start)}&fields=id,sentAt`;
+  const ids = fetchAll(qUrl, headers).map(r => r.id);
+
+  let totalSent = 0;
+  ids.forEach(id => {
+    const stats = fetchJson(`${BASE}/list-emails/${id}/stats`, headers);
+    // Depending on your definition use stats.sent or stats.delivered
+    totalSent += Number(stats.sent || 0);
+  });
+  console.log(`totalSent: ${totalSent}`);
+  return totalSent;
+}
+
+function fetchJson(url, headers) {
+  const res = UrlFetchApp.fetch(url, {headers});
+  return JSON.parse(res.getContentText());
+}
+
+function fetchAll(url, headers) {
+  // add pagination handling if your BU sends a lot; omitted for brevity
+  return fetchJson(url, headers).results || [];
+}
+

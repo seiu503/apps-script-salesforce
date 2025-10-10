@@ -21,7 +21,8 @@ async function getPardotListEmails() {
     const qp = new QueryParameters();
     qp.setSelect(pardotFieldsArray.toString());
     qp.setFrom("ListEmail");
-    qp.setWhere(`ScheduledDate = LAST_N_DAYS:7 AND TotalSent > 1`); 
+    qp.setWhere(`ScheduledDate = LAST_N_DAYS:365 AND TotalSent > 1`); 
+    qp.setOrderBy('ScheduledDate DESC NULLS LAST, Id DESC');
 
     const records = await get(qp, '50', 'prod');
 

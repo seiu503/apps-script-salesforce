@@ -10,6 +10,8 @@ async function updateCampaignAssessment(
   Job_Title__c, 
   Willing_to_Help__c, 
   Preferred_Language_from_form__c, 
+  Signed_Auth_Card__c,
+  Auth_Card_Date__c,
   Phone_from_form__c, 
   Address__c,
   City__c,
@@ -46,6 +48,8 @@ async function updateCampaignAssessment(
   // Relationships__c = 'relationship notes',
   // Potential_Leader__c = false,
   // In_Unit__c = false,
+  // Signed_Auth_Card__c,
+  // Auth_Card_Date__c,
   // AppSheet_ID__c = '12345678',
   // AppSheet_Department__c = 'a1WRf0000027uXN', // prod ID
   // env = 'prod') {
@@ -72,6 +76,8 @@ async function updateCampaignAssessment(
     Relationships__c,
     Potential_Leader__c,
     In_Unit__c,
+    Signed_Auth_Card__c,
+    Auth_Card_Date__c,
     AppSheet_ID__c,
     AppSheet_Department__c
   };
