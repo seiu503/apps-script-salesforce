@@ -1,6 +1,6 @@
 
 
-async function getUserByEmail(email='kressk@seiu503.org', env = 'prod', campaign='sapphireCC') {
+async function getUserByEmail(email='downeyj@seiu503.org', env = 'prod', campaign='sapphireCC') {
 
   const config = globalConfig(campaign);
   const ss = SpreadsheetApp.openByUrl(config.sheetURL);
