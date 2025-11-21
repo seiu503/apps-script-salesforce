@@ -1,7 +1,7 @@
 // 'a2RRt000000pii9MAA', // my student worker CA in sandbox
 // 'a2RRf000000cdunMAA', // my test jackson county CA in prod
 
-async function global_getCAById(id='a2RRf000000cdunMAA', env='prod', campaign='jacksonCounty') {
+async function global_getCAById(id, env, campaign) {
   console.log(`global_getCAById.gs > 5, id: ${id}`);
 
   // set config

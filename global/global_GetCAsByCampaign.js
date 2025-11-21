@@ -1,4 +1,4 @@
-async function global_getCAsByCampaign(env = 'prod', campaign = 'jacksonCounty') {
+async function global_getCAsByCampaign(env = 'prod', campaign) {
   console.log(`global_getCAsByCampaign.gs > 33: env: ${env}`);
   // set config
   const config = globalConfig(campaign);
@@ -44,6 +44,7 @@ async function global_getCAsByCampaign(env = 'prod', campaign = 'jacksonCounty')
 
 async function global_setCAsSimple(payload, sheet, campaign) {
   console.log(`global_setCAsSimple`);
+  console.log(`sheet: ${sheet.getName()}`);
   const config = globalConfig(campaign);
   
   

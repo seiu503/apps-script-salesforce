@@ -178,7 +178,7 @@ const globalConfig = (campaign, turf) => {
       studentWorkers: 'AB',
       sapphireCC: 'W',
       jacksonCounty: 'AA',
-      cascade: 'Y'
+      cascade: 'Z'
     },
     sheetShortVar: {
       studentWorkers: 'swss',
@@ -209,7 +209,7 @@ const globalConfig = (campaign, turf) => {
   
 }
 
-const config = globalConfig(campaign = 'jacksonCounty');
+const config = globalConfig(campaign="cascade");
 const ss = SpreadsheetApp.openByUrl(config.sheetURL);
 console.log(`config ss: ${ss.getName()}`);
 const workers = ss.getSheetByName(config.workerSheetName); 
