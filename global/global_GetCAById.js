@@ -10,10 +10,9 @@ async function global_getCAById(id, env, campaign) {
   console.log(`config ss: ${ss.getName()}`);
   const workers = ss.getSheetByName(config.workerSheetName); 
 
-
   if (id) {
     const qp = new QueryParameters();
-    qp.setSelect(SP_CAfieldsArray.toString());
+    qp.setSelect(config.fieldList.toString());
     qp.setFrom("Higher_Ed_Strike_Pledge__c");
     qp.setWhere(`Id = \'${id}\'`);
 

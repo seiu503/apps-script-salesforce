@@ -16,7 +16,7 @@ async function global_createNewConversation(
   Issues__c,
   Follow_up__c, 
   env = 'prod',
-  campaign = 'jacksonCounty') {
+  campaign) {
   console.log(`global_createNewConversation.gs > 19, env: ${env}`);
 
   let today = formatSFDate(new Date());
