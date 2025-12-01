@@ -113,6 +113,38 @@ const globalConfig = (campaign, turf) => {
         'Assessment_Notes__c',
         'LatLon__c'
       ],
+      ojd: [
+        'Id',
+        'First_name_from_form__c',
+        'Preferred_Name_from_Form__c',
+        'Last_Name_from_form__c',
+        'Pronouns__c',
+        'Email_from_form__c',
+        'AGENCY_from_form__c',
+        'Job_Title__c',
+        'Preferred_Language_from_form__c',
+        'Phone_from_form__c',
+        'Address__c',
+        'City__c',
+        'State__c', 
+        'ZIP__c',
+        'Potential_Leader__c',
+        'In_Unit__c',
+        'AppSheet_ID__c',
+        'Signed_Auth_Card__c',
+        'Auth_Card_Date__c',
+        'Signed_Membership_Form__c',
+        'Member_Form_Signed_Date_Time__c',
+        'OC__c',
+        'AddressConfirmed__c',
+        'PhoneConfirmed__c',
+        'ContactInfoNotes__c',
+        'Assessment_Notes__c',
+        'LatLon__c',
+        'Remote_Worker__c',
+        'Past_Represented_Worker__c',
+        'Department__c'
+      ],
       memberLeader: [
         'Id', 
         'Salutation_Last__c', 
@@ -132,6 +164,7 @@ const globalConfig = (campaign, turf) => {
       sapphireCC: 'Higher_Ed_Strike_Pledge__c',
       jacksonCounty: 'Higher_Ed_Strike_Pledge__c',
       cascade: 'Higher_Ed_Strike_Pledge__c',
+      ojd: 'Higher_Ed_Strike_Pledge__c',
       memberLeader: 'Contact'
     },
     qpWhere: {
@@ -139,27 +172,31 @@ const globalConfig = (campaign, turf) => {
       sapphireCC: `Campaign_Name_Picklist__c = 'Sapphire'`,
       jacksonCounty: `Campaign_Name_Picklist__c = 'Jackson County Libraries'`,
       cascade: `Campaign_Name_Picklist__c = 'Cascade Terrace PA 2025'`,
+      ojd: `Campaign_Name_Picklist__c = '2025 Oregon Judicial Department (OJD)'`,
       memberLeader: `Employer_Name_Text__c = \'${turf}\' AND Active_Worker__c = TRUE`
     },
     campaignPicklist: {
       studentWorkers: 'Sapphire',
       sapphireCC: 'Student Workers',
       jacksonCounty: 'Jackson County Libraries',
-      cascade: 'Cascade Terrace PA 2025'
+      cascade: 'Cascade Terrace PA 2025',
+      ojd: '2025 Oregon Judicial Department (OJD)'
     },
     sheetURL: {
       studentWorkers: 'https://docs.google.com/spreadsheets/d/14a5ZRXFbAl69VQ98aJ1lCnWLcfh3mhZrKpsxAT01btA/edit',
       sapphireCC: 'https://docs.google.com/spreadsheets/d/1JktJuDesKyZMW6gcM2wRNzIs-BAfobNcC6DuvYg_itM/edit',
       jacksonCounty: 'https://docs.google.com/spreadsheets/d/1M5ceAgQIXuM19Nq-WHBJAoZu8dkOWJevto8dbL9Gglk/edit',
       memberLeader: 'https://docs.google.com/spreadsheets/d/11pYOEoAtTtxH_5y6uxzVuhUis6DvZxFJoazHnuMD4R4/edit',
-      cascade: 'https://docs.google.com/spreadsheets/d/1IOpNNpnpHpn8sHs2ejjsVtcrR_UuKHn7T5Qs8hyq6_0/edit'
+      cascade: 'https://docs.google.com/spreadsheets/d/1IOpNNpnpHpn8sHs2ejjsVtcrR_UuKHn7T5Qs8hyq6_0/edit',
+      ojd: 'https://docs.google.com/spreadsheets/d/1yV1fXPCZiwsOXCboEawMMHGO0esTxyZ1WyIn9EvgI4U/edit'
     },
     workerSheetName: {
       studentWorkers: 'StudentWorkers',
       sapphireCC: 'Workers',
       jacksonCounty: 'Workers',
       memberLeader: 'MemberChartingApp',
-      cascade: 'Workers'
+      cascade: 'Workers',
+      ojd: 'Workers'
     },
     // CAIDColumn: {
     //   studentWorkers: 'A2:A',
@@ -172,25 +209,29 @@ const globalConfig = (campaign, turf) => {
       sapphireCC: 'Q2:Q',
       jacksonCounty: 'Q2:Q',
       memberLeader: '',
-      cascade: 'Q2:Q'
+      cascade: 'Q2:Q',
+      ojd: 'Q2:Q'
     },  
     lastSFColumn: {
       studentWorkers: 'AB',
       sapphireCC: 'W',
       jacksonCounty: 'AA',
-      cascade: 'Z'
+      cascade: 'Z',
+      ojd: 'AD'
     },
     sheetShortVar: {
       studentWorkers: 'swss',
       sapphireCC: 'spss',
       jacksonCounty: 'jcss',
-      cascade: 'ctss'
+      cascade: 'ctss',
+      ojd: 'odjss'
     },
     env: {
       studentWorkers: 'prod',
       sapphireCC: 'prod',
       jacksonCounty: 'prod',
-      cascade: 'prod'
+      cascade: 'prod',
+      ojd: 'prod'
     }
   }
 
@@ -209,7 +250,7 @@ const globalConfig = (campaign, turf) => {
   
 }
 
-const config = globalConfig(campaign="cascade");
+const config = globalConfig(campaign="ojd");
 const ss = SpreadsheetApp.openByUrl(config.sheetURL);
 console.log(`config ss: ${ss.getName()}`);
 const workers = ss.getSheetByName(config.workerSheetName); 
