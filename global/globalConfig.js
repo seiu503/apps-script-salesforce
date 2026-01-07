@@ -143,8 +143,7 @@ const globalConfig = (campaign, turf) => {
         'LatLon__c',
         'Remote_Worker__c',
         'Past_Represented_Worker__c',
-        'Department__c',
-        'Organizer_AppSheet_Turf__c'
+        'Department__c'
       ],
       memberLeader: [
         'Id', 
@@ -218,7 +217,7 @@ const globalConfig = (campaign, turf) => {
       sapphireCC: 'W',
       jacksonCounty: 'AA',
       cascade: 'Z',
-      ojd: 'AE'
+      ojd: 'AD'
     },
     sheetShortVar: {
       studentWorkers: 'swss',
