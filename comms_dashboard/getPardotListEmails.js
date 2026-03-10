@@ -26,34 +26,58 @@ async function getPardotListEmails() {
 
     const records = await get(qp, '50', 'prod');
 
+
+    console.log(`records.length = ${records.length}`);
+
+    const dignityInRecords = records.filter(r => String(r.Name || '').startsWith('Dignity'));
+    console.log(`dignity in records = ${dignityInRecords.length}`);
+
+
+
     if (records) {
       console.log(records[1]);
 
   // Format output
-  const output = records
-  .filter(r => !String(r.Name || '').startsWith('Send Email'))
+  const output = (records || [])
+  .filter(r => {
+    const name = String(r.Name || '');
+    // keep everything except "Send Email..." and except missing CampaignId (if you still want that rule)
+    return !name.startsWith('Send Email')
+  })
   .filter(r => r.CampaignId || String(r.Name || '').startsWith('Dignity'))
   .map(record => {
-    const name = String(record.Name || '');
-    const dignityOverride = name.startsWith('Dignity');
+    const name = String(record.Name || '').trim();
+
+    const campaignName =
+      name.startsWith('Dignity')
+        ? 'Dignity'
+        : (record.Campaign && record.Campaign.Name)
+            ? record.Campaign.Name
+            : 'Unknown Campaign';
 
     return [
-      record.Name || '',
+      name,
       record.CampaignId || '',
-      // If Campaign is missing but it’s a Dignity email, fill Campaign Name so reporting works
-      (record.Campaign && record.Campaign.Name) ? record.Campaign.Name : (dignityOverride ? 'Dignity' : ''),
+      campaignName,
       record.Subject || '',
       record.ScheduledDate || '',
-      record.TotalSent || 0,
-      record.TotalDelivered || 0,
-      record.UniqueOpens || 0,
-      record.UniqueTrackedLinkClicks || 0,
-      record.OpenRate || 0,
-      record.ClickThroughRate || 0,
-      record.ClickToOpenRatio || 0,
-      record.UniqueOptOuts || 0
+      Number(record.TotalSent || 0),
+      Number(record.TotalDelivered || 0),
+      Number(record.UniqueOpens || 0),
+      Number(record.UniqueTrackedLinkClicks || 0),
+      Number(record.OpenRate || 0),
+      Number(record.ClickThroughRate || 0),
+      Number(record.ClickToOpenRatio || 0),
+      Number(record.UniqueOptOuts || 0)
     ];
   });
+
+
+  console.log(`output.length = ${output.length}`);
+  const dignityInOutput = output.filter(row => String(row[0] || '').startsWith('Dignity'));
+  console.log(`dignity in output = ${dignityInOutput.length}`);
+  if (dignityInOutput.length) console.log(`first dignity output row = ${JSON.stringify(dignityInOutput[0])}`);
+
 
 
   // Write to Sheet
@@ -77,7 +101,28 @@ async function getPardotListEmails() {
     'Click to Open Ratio',
     'Unique Opt Outs'
   ]);
-  pardot_metrics.getRange(2, 1, output.length, output[0].length).setValues(output);
+
+  try {
+    pardot_metrics.getRange(2, 1, output.length, output[0].length).setValues(output);
+    SpreadsheetApp.flush();  
+    console.log('setValues succeeded');
+  } catch (e) {
+    console.error('setValues FAILED:', e);
+    console.log(`output.length=${output.length}, cols=${output[0]?.length}`);
+    console.log(`Example row: ${JSON.stringify(output[0])}`);
+    throw e;
+  }
+
+  console.log(`Sheet last row after write: ${pardot_metrics.getLastRow()}`);
+  console.log(`Expected last row: ${output.length + 1}`);
+
+  // Prove that "Dignity" exists in the sheet after the write
+  const found = pardot_metrics.createTextFinder('Dignity')
+    .matchCase(false)
+    .findNext();
+
+  console.log(`Finder result: ${found ? `FOUND at row ${found.getRow()}, col ${found.getColumn()}` : 'NOT FOUND'}`);
+
 
     } else {
       logErrorFunctions('getPardotListEmails', null, null, 'No records returned');

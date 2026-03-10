@@ -80,7 +80,7 @@ const testStops = [ [ 'c86cfc5c',
     'a2RRf000000cLJbMAM' ] 
 ]
 
-async function processOptimizedRoute(campaign='jacksonCounty', user='schneiders@seiu503.org', routeId="ac476fe5", userOrigin="42.3128789,-122.8681219") {
+async function processOptimizedRoute(campaign='ojd', user='schneiders@seiu503.org', routeId="ac476fe5", userOrigin="42.3128789,-122.8681219") {
   console.log('processOptimizedRoute > 53');
   console.log(`campaign: ${campaign}, routeId: ${routeId}, user: ${user}`);
   const apiKey = GOOGLE_MAPS_API_KEY_2;
@@ -210,7 +210,7 @@ function geocodeAddressSimple(address) {
   }
 }
 
-async function geocodeTable(campaign='jacksonCounty',latlonIndex=26,latlonRange='AA',idIndex=16,idRange='Q') {
+async function geocodeTable(campaign='ojd',latlonIndex=26,latlonRange='AA',idIndex=16,idRange='Q') {
   const apiKey = GOOGLE_MAPS_API_KEY_2;
   const config = globalConfig(campaign);
   const ss = SpreadsheetApp.openByUrl(config.sheetURL);
@@ -218,7 +218,20 @@ async function geocodeTable(campaign='jacksonCounty',latlonIndex=26,latlonRange=
   const data = workers.getDataRange().getValues(); // all data in sheet
 
   const headers = data[0];
-  const allRowsWithAddresses = data.slice(1).filter(row => !!row[10] && !!row[11] && !!row[12] && !!row[13] && !row[10].includes('PO Box')); // skip header
+  const allRowsWithAddresses = data.slice(1).filter(row => {
+    const street = String(row[10] ?? "").trim();
+    const city = String(row[11] ?? "").trim();
+    const state = String(row[12] ?? "").trim();
+    const zip = String(row[13] ?? "").trim();
+
+    return (
+      street &&
+      city &&
+      state &&
+      zip &&
+      !/p\.?\s*o\.?\s*box/i.test(street)
+    );
+  });
   console.log(allRowsWithAddresses);
 
   allRowsWithAddresses.forEach( async (row) => {
@@ -231,8 +244,10 @@ async function geocodeTable(campaign='jacksonCounty',latlonIndex=26,latlonRange=
     if (!result.error) {
       // write latlon values back to sheet
       const appSheetIds = workers.getRange(`${idRange}2:${idRange}`).getValues().flat();
+      // console.log(`appSheetIds`, appSheetIds);
       // find matching appSheetId
       const rowIndex = appSheetIds.indexOf(rowId);
+      // console.log('rowIndex', rowIndex);
       if (rowIndex > 1) {
         const latlonCell = workers.getRange(`${latlonRange}${rowIndex + 2}`);
         latlonCell.setValue(result);
