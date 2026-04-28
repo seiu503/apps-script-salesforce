@@ -80,7 +80,7 @@ const testStops = [ [ 'c86cfc5c',
     'a2RRf000000cLJbMAM' ] 
 ]
 
-async function processOptimizedRoute(campaign='ojd', user='schneiders@seiu503.org', routeId="ac476fe5", userOrigin="42.3128789,-122.8681219") {
+async function processOptimizedRoute(campaign='ojd', user='schneiders@seiu503.org', routeId="ac476fe5", userOrigin="45.529055028151035, -122.65997284733616") {
   console.log('processOptimizedRoute > 53');
   console.log(`campaign: ${campaign}, routeId: ${routeId}, user: ${user}`);
   const apiKey = GOOGLE_MAPS_API_KEY_2;

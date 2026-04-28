@@ -143,7 +143,9 @@ const globalConfig = (campaign, turf) => {
         'LatLon__c',
         'Remote_Worker__c',
         'Past_Represented_Worker__c',
-        'Department__c'
+        'Department__c',
+        'Story_Testimony__c',
+        'Spokesperson__c'
       ],
       memberLeader: [
         'Id', 
@@ -157,6 +159,40 @@ const globalConfig = (campaign, turf) => {
         'Salutation_Name__c', 
         'Pre_Fill_Member_Form_Link__c', 	
         'Current_Member_Status__c'
+      ],
+      tigard: [
+        'Id',
+        'First_name_from_form__c',
+        'Preferred_Name_from_Form__c',
+        'Last_Name_from_form__c',
+        'Pronouns__c',
+        'Email_from_form__c',
+        'AGENCY_from_form__c',
+        'Job_Title__c',
+        'Preferred_Language_from_form__c',
+        'Phone_from_form__c',
+        'Address__c',
+        'City__c',
+        'State__c', 
+        'ZIP__c',
+        'Potential_Leader__c',
+        'In_Unit__c',
+        'AppSheet_ID__c',
+        'Signed_Auth_Card__c',
+        'Auth_Card_Date__c',
+        'Signed_Membership_Form__c',
+        'Member_Form_Signed_Date_Time__c',
+        'OC__c',
+        'AddressConfirmed__c',
+        'PhoneConfirmed__c',
+        'ContactInfoNotes__c',
+        'Assessment_Notes__c',
+        'LatLon__c',
+        'Remote_Worker__c',
+        'Past_Represented_Worker__c',
+        'Department__c',
+        'Story_Testimony__c',
+        'Spokesperson__c'
       ]
     },
     workerObject: {
@@ -165,6 +201,7 @@ const globalConfig = (campaign, turf) => {
       jacksonCounty: 'Higher_Ed_Strike_Pledge__c',
       cascade: 'Higher_Ed_Strike_Pledge__c',
       ojd: 'Higher_Ed_Strike_Pledge__c',
+      tigard: 'Higher_Ed_Strike_Pledge__c',
       memberLeader: 'Contact'
     },
     qpWhere: {
@@ -173,6 +210,7 @@ const globalConfig = (campaign, turf) => {
       jacksonCounty: `Campaign_Name_Picklist__c = 'Jackson County Libraries'`,
       cascade: `Campaign_Name_Picklist__c = 'Cascade Terrace PA 2025'`,
       ojd: `Campaign_Name_Picklist__c = '2025 Oregon Judicial Department (OJD)'`,
+      tigard: `Campaign_Name_Picklist__c = '2026 City of Tigard (EXTERNAL)'`,
       memberLeader: `Employer_Name_Text__c = \'${turf}\' AND Active_Worker__c = TRUE`
     },
     campaignPicklist: {
@@ -180,7 +218,8 @@ const globalConfig = (campaign, turf) => {
       sapphireCC: 'Student Workers',
       jacksonCounty: 'Jackson County Libraries',
       cascade: 'Cascade Terrace PA 2025',
-      ojd: '2025 Oregon Judicial Department (OJD)'
+      ojd: '2025 Oregon Judicial Department (OJD)',
+      tigard: '2026 City of Tigard (EXTERNAL)'
     },
     sheetURL: {
       studentWorkers: 'https://docs.google.com/spreadsheets/d/14a5ZRXFbAl69VQ98aJ1lCnWLcfh3mhZrKpsxAT01btA/edit',
@@ -188,7 +227,8 @@ const globalConfig = (campaign, turf) => {
       jacksonCounty: 'https://docs.google.com/spreadsheets/d/1M5ceAgQIXuM19Nq-WHBJAoZu8dkOWJevto8dbL9Gglk/edit',
       memberLeader: 'https://docs.google.com/spreadsheets/d/11pYOEoAtTtxH_5y6uxzVuhUis6DvZxFJoazHnuMD4R4/edit',
       cascade: 'https://docs.google.com/spreadsheets/d/1IOpNNpnpHpn8sHs2ejjsVtcrR_UuKHn7T5Qs8hyq6_0/edit',
-      ojd: 'https://docs.google.com/spreadsheets/d/1yV1fXPCZiwsOXCboEawMMHGO0esTxyZ1WyIn9EvgI4U/edit'
+      ojd: 'https://docs.google.com/spreadsheets/d/1yV1fXPCZiwsOXCboEawMMHGO0esTxyZ1WyIn9EvgI4U/edit',
+      tigard: 'https://docs.google.com/spreadsheets/d/1TEHpY-kEEJBbcey48R9rxps1vpsL0rA-jbb5VSBNPIg/edit'
     },
     workerSheetName: {
       studentWorkers: 'StudentWorkers',
@@ -196,7 +236,8 @@ const globalConfig = (campaign, turf) => {
       jacksonCounty: 'Workers',
       memberLeader: 'MemberChartingApp',
       cascade: 'Workers',
-      ojd: 'Workers'
+      ojd: 'Workers',
+      tigard: 'Workers'
     },
     // CAIDColumn: {
     //   studentWorkers: 'A2:A',
@@ -210,28 +251,32 @@ const globalConfig = (campaign, turf) => {
       jacksonCounty: 'Q2:Q',
       memberLeader: '',
       cascade: 'Q2:Q',
-      ojd: 'Q2:Q'
+      ojd: 'Q2:Q',
+      tigard: 'Q2:Q'
     },  
     lastSFColumn: {
       studentWorkers: 'AB',
       sapphireCC: 'W',
       jacksonCounty: 'AA',
       cascade: 'Z',
-      ojd: 'AD'
+      ojd: 'AF',
+      tigard: 'AF'
     },
     sheetShortVar: {
       studentWorkers: 'swss',
       sapphireCC: 'spss',
       jacksonCounty: 'jcss',
       cascade: 'ctss',
-      ojd: 'odjss'
+      ojd: 'odjss',
+      tigard: 'tig'
     },
     env: {
       studentWorkers: 'prod',
       sapphireCC: 'prod',
       jacksonCounty: 'prod',
       cascade: 'prod',
-      ojd: 'prod'
+      ojd: 'prod',
+      tigard: 'prod'
     }
   }
 
